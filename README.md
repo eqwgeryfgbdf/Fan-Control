@@ -12,10 +12,13 @@ v1.0.1 包含風扇控制服務啟動及韌體回讀延遲修正，已於 2026-1
 
 從 [v1.0.1 Release](https://github.com/eqwgeryfgbdf/MacminiContoral/releases/tag/v1.0.1) 下載 Universal DMG；私有倉庫需要登入具有存取權的 GitHub 帳號。
 
+本地開發版為 v1.0.1（build 3）：新增選單列迷你轉速走勢，以及展開面板內最近一分鐘的圖表。這項功能尚未推送 GitHub，已發布的 v1.0.1 DMG 仍是 build 2。
+
 ## Features
 
 - A chart-focused main window with 1, 5, and 15 minute history, per-fan actual RPM, firmware limits, and current mode.
-- A persistent menu bar item showing actual RPM and CPU temperature. The panel also shows GPU temperature, manual target selection, Apply, and Restore Automatic.
+- A persistent menu bar item showing actual RPM, CPU temperature, and an optional monochrome one-minute sparkline. The panel also shows GPU temperature, a one-minute RPM chart, manual target selection, Apply, and Restore Automatic.
+- Menu bar trends keep updating when the main chart is paused. Missing readings remain gaps; the chart shows real samples only, with a minimum 200 RPM vertical span to avoid amplifying minor sensor noise. The mini sparkline can be turned off in Settings.
 - Real readings sampled once per second off the main thread. Pausing the chart does not pause sensor readings or control heartbeats. History stays in memory and is not uploaded.
 - macOS 26+ uses the native toolbar appearance and one regular Liquid Glass surface for the interactive fan controls. macOS 15 uses standard material. Reduce Transparency uses an opaque control surface. Data and charts never use custom glass.
 - Standard system fonts and SF Symbols. Light and dark appearance follow the system.
@@ -32,7 +35,7 @@ open 'dist/Macmini contoral.app'
 
 The script builds arm64 and x86_64, combines both into universal app/helper executables, embeds the launch daemon, and signs the bundle. Override `SIGNING_IDENTITY` to select a different signing certificate. The minimum OS is encoded as 15.0 in both binary architectures and Info.plist.
 
-The default version is 1.0.1 (build 2); `APP_VERSION` and `BUILD_NUMBER` can override it. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG.
+The local development default is 1.0.1 (build 3); the published v1.0.1 DMG remains build 2. `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG; choose a new release version when publishing the chart feature.
 
 Install the app in `/Applications` or your `~/Applications` folder before enabling the control service. The local deliverable uses development signing; it is not a notarized public release.
 
@@ -70,4 +73,5 @@ See `docs/validation.md` and `design-qa.md` for the actual verification record. 
 - [Materials and Liquid Glass guidance](https://developer.apple.com/design/human-interface-guidelines/materials)
 - [Applying Liquid Glass to custom views](https://developer.apple.com/documentation/swiftui/applying-liquid-glass-to-custom-views)
 - [MenuBarExtra](https://developer.apple.com/documentation/swiftui/menubarextra)
+- [Charts design guidance](https://developer.apple.com/design/human-interface-guidelines/charts)
 - [SMAppService](https://developer.apple.com/documentation/servicemanagement/smappservice)

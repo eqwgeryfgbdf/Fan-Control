@@ -165,6 +165,7 @@ struct MenuPanel: View {
                 metric("GPU 平均", icon: "cpu", value: Format.temperature(model.isStale ? nil : model.snapshot?.gpu.average))
                 Text("可用感測器平均").font(.caption).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
             }
+            MenuTrendChart(model: model)
             Divider()
             if (model.snapshot?.fans.count ?? 0) > 1 {
                 Picker("風扇", selection: $model.selectedFan) { ForEach(model.snapshot?.fans ?? []) { Text($0.name).tag($0.id) } }
@@ -212,6 +213,7 @@ struct MenuPanel: View {
         VStack(spacing: 16) {
             Picker("控制模式", selection: $model.manualSelection) { Text("自動").tag(false); Text("手動").tag(true) }
                 .pickerStyle(.segmented)
+                .labelsHidden()
                 .onChange(of: model.manualSelection) { _, manual in if !manual && !control.busy { Task { await model.automatic() } } }
                 .disabled(control.busy)
             if model.manualSelection, let fan = model.usableFan, fan.controllable, let minimum = fan.minimum, let maximum = fan.maximum {
@@ -237,7 +239,7 @@ struct MenuPanel: View {
             } else {
                 Label(model.usableFan?.isAutomatic == true ? "由 macOS 自動調節風扇" : "\(model.usableFan?.mode == nil ? "等待控制狀態" : "目前為手動調節")", systemImage: "fanblades").font(.callout).foregroundStyle(.secondary)
             }
-        }.padding(12).modifier(AdaptiveControls())
+        }.frame(maxWidth: .infinity, alignment: .leading).padding(12).modifier(AdaptiveControls())
     }
 }
 
@@ -246,6 +248,7 @@ struct SettingsView: View {
     @ObservedObject var control: ControlClient
     @State private var loginEnabled = SMAppService.mainApp.status == .enabled
     @State private var loginError: String?
+    @AppStorage("showMenuBarTrend") private var showMenuBarTrend = true
     var body: some View {
         Form {
             Section("一般") {
@@ -269,6 +272,8 @@ struct SettingsView: View {
                 Text("App 結束、控制連線中斷或系統過熱時，控制服務會恢復自動調節。").font(.caption).foregroundStyle(.secondary)
             }
             Section("顯示與感測器") {
+                Toggle("選單列顯示迷你走勢圖", isOn: $showMenuBarTrend)
+                Text("顯示最近一分鐘的實際轉速；展開選單列可查看完整走勢。").font(.caption).foregroundStyle(.secondary)
                 LabeledContent("更新頻率", value: "每秒一次")
                 LabeledContent("CPU 感測器", value: "\(model.snapshot?.cpu.sensorCount ?? 0) 個")
                 LabeledContent("GPU 感測器", value: "\(model.snapshot?.gpu.sensorCount ?? 0) 個")
