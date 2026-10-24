@@ -6,6 +6,7 @@ import FanCore
     static let shared = MonitorModel()
     @Published var snapshot: Snapshot?
     @Published var history: [HistoryPoint] = []
+    @Published private(set) var menuHistory: [HistoryPoint] = []
     @Published var selectedFan = 0
     @Published var minutes = 5
     @Published var historyPaused = false
@@ -22,6 +23,7 @@ import FanCore
     var fan: FanReading? { snapshot?.fans.first { $0.id == selectedFan } }
     var isStale: Bool { snapshot.map { now.timeIntervalSince($0.timestamp) > 3 } ?? true }
     var usableFan: FanReading? { !isStale ? fan : nil }
+    var menuTrend: FanTrend { FanTrend(history: menuHistory, fanID: selectedFan, end: now) }
     var visibleHistory: [HistoryPoint] {
         let end = historyPaused ? (history.last?.time ?? now) : now
         return history.filter { $0.fanID == selectedFan && $0.time >= end.addingTimeInterval(-Double(minutes * 60)) }
@@ -43,7 +45,7 @@ import FanCore
             Task { @MainActor in await self?.control.restore() }
         })
         observers.append(NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
-            Task { @MainActor in self?.history.removeAll(); self?.snapshot = nil; self?.manualSelection = false }
+            Task { @MainActor in self?.history.removeAll(); self?.menuHistory.removeAll(); self?.snapshot = nil; self?.manualSelection = false }
         })
     }
     private func receive(_ sample: Snapshot) {
@@ -52,6 +54,11 @@ import FanCore
         if let fan, fan.controllable, let min = fan.minimum, let max = fan.maximum {
             targetRPM = Swift.min(Swift.max(targetRPM, min), max)
         }
+        // Menu bar trends stay live even while the main history chart is paused.
+        for fan in sample.fans { menuHistory.append(HistoryPoint(time: sample.timestamp, fanID: fan.id, rpm: fan.rpm)) }
+        if sample.fans.isEmpty { menuHistory.append(HistoryPoint(time: sample.timestamp, fanID: selectedFan, rpm: nil)) }
+        menuHistory.removeAll { $0.time < now.addingTimeInterval(-60) }
+        if menuHistory.count > 610 { menuHistory.removeFirst(menuHistory.count - 610) }
         if !historyPaused {
             for fan in sample.fans { history.append(HistoryPoint(time: sample.timestamp, fanID: fan.id, rpm: fan.rpm)) }
             if sample.fans.isEmpty { history.append(HistoryPoint(time: sample.timestamp, fanID: selectedFan, rpm: nil)) }
