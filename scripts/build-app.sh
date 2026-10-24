@@ -2,8 +2,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 BUILD_MODE="${BUILD_MODE:-release}"
-APP_VERSION="${APP_VERSION:-1.0.1}"
-BUILD_NUMBER="${BUILD_NUMBER:-3}"
+APP_VERSION="${APP_VERSION:-1.0.2}"
+BUILD_NUMBER="${BUILD_NUMBER:-4}"
 if [[ ! "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ || ! "$BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
   echo 'Invalid application version or build number.' >&2
   exit 1
@@ -20,7 +20,7 @@ swift build --build-system native -c "$BUILD_MODE" --triple arm64-apple-macosx15
 BIN_PATH="$(swift build --build-system native -c "$BUILD_MODE" --triple arm64-apple-macosx15.0 --scratch-path .build/native-apple --show-bin-path)"
 swift build --build-system native -c "$BUILD_MODE" --triple x86_64-apple-macosx15.0 --scratch-path .build/native-intel
 INTEL_PATH="$(swift build --build-system native -c "$BUILD_MODE" --triple x86_64-apple-macosx15.0 --scratch-path .build/native-intel --show-bin-path)"
-APP="$PWD/dist/Macmini contoral.app"
+APP="$PWD/dist/風扇管理 Fan Control.app"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Library/LaunchDaemons"
 lipo -create "$BIN_PATH/MacminiContoral" "$INTEL_PATH/MacminiContoral" -output "$APP/Contents/MacOS/MacminiContoral"
 lipo -create "$BIN_PATH/MacminiHelper" "$INTEL_PATH/MacminiHelper" -output "$APP/Contents/MacOS/MacminiHelper"
@@ -33,7 +33,7 @@ import sys, plistlib, pathlib
 app, team, version, build = sys.argv[1:]
 info = {
  'CFBundleExecutable':'MacminiContoral', 'CFBundleIdentifier':'local.macmini.contoral',
- 'CFBundleName':'Macmini contoral', 'CFBundleDisplayName':'主機管理-Macmini contoral',
+ 'CFBundleName':'風扇管理 Fan Control', 'CFBundleDisplayName':'風扇管理 Fan Control',
  'CFBundleDevelopmentRegion':'zh_TW', 'CFBundleLocalizations':['zh-Hant'],
  'CFBundlePackageType':'APPL','CFBundleShortVersionString':version,'CFBundleVersion':build,
  'LSMinimumSystemVersion':'15.0','NSHighResolutionCapable':True,

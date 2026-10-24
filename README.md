@@ -1,4 +1,4 @@
-# 主機管理-Macmini contoral
+# 風扇管理 Fan Control
 
 Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected visual reference is `docs/selected-design.png`.
 
@@ -10,9 +10,11 @@ Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected v
 
 v1.0.1 包含風扇控制服務啟動及韌體回讀延遲修正，已於 2026-10-24 在 M4 Mac mini 驗證即時監測、1,500／2,000 RPM 手動調速、降速及恢復自動，見 [手動控制實機測試](docs/manual-control-validation-2026-10-24.md)。macOS 15、Intel 與其他機型尚未完成實機測試。
 
-從 [v1.0.1 Release](https://github.com/eqwgeryfgbdf/MacminiContoral/releases/tag/v1.0.1) 下載 Universal DMG；私有倉庫需要登入具有存取權的 GitHub 帳號。
+從 [v1.0.2 Release](https://github.com/eqwgeryfgbdf/MacminiContoral/releases/tag/v1.0.2) 下載 Universal DMG；私有倉庫需要登入具有存取權的 GitHub 帳號。
 
-本地開發版為 v1.0.1（build 3）：新增選單列迷你轉速走勢，以及展開面板內最近一分鐘的圖表。這項功能尚未推送 GitHub，已發布的 v1.0.1 DMG 仍是 build 2。
+v1.0.2（build 4）正式更名為「風扇管理 Fan Control」，新增選單列迷你轉速走勢，以及展開面板內最近一分鐘的圖表。已完成選單列實機調速、降速、恢復自動與圖表更新驗證，詳見 [選單列與圖表驗證紀錄](docs/menu-bar-chart-validation-2026-10-24.md)。
+
+![選單列即時圖表](docs/menu-bar-chart.png)
 
 ## Features
 
@@ -30,12 +32,12 @@ Requires Xcode 26 or newer and a valid Apple Development or Developer ID signing
 ```sh
 ./scripts/build-app.sh
 ./scripts/package-dmg.sh
-open 'dist/Macmini contoral.app'
+open 'dist/風扇管理 Fan Control.app'
 ```
 
 The script builds arm64 and x86_64, combines both into universal app/helper executables, embeds the launch daemon, and signs the bundle. Override `SIGNING_IDENTITY` to select a different signing certificate. The minimum OS is encoded as 15.0 in both binary architectures and Info.plist.
 
-The local development default is 1.0.1 (build 3); the published v1.0.1 DMG remains build 2. `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG; choose a new release version when publishing the chart feature.
+The default version is 1.0.2 (build 4). `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG.
 
 Install the app in `/Applications` or your `~/Applications` folder before enabling the control service. The local deliverable uses development signing; it is not a notarized public release.
 
@@ -45,7 +47,7 @@ Monitoring needs no administrator permission. Choose **啟用風扇控制** in t
 
 After approval, choose Manual, select a target within the firmware-reported range, and Apply. The target setting and actual fan speed are displayed separately. A successful write is reported only after mode and target readback; physical RPM can take time to settle.
 
-When upgrading, restore automatic control and quit the old app before replacing it. Launch the new copy from Applications and choose **重新啟動控制服務** in Settings to load the updated helper. If macOS requests approval again, complete it in Login Items & Extensions.
+When upgrading, restore automatic control and quit the old app before replacing it. Version 1.0.2 renames the app bundle to `風扇管理 Fan Control.app`; remove the old `Macmini contoral.app` from Applications before installing the new bundle to avoid duplicate copies. Launch the new copy from Applications and choose **重新啟動控制服務** in Settings to load the updated helper. If macOS requests approval again, complete it in Login Items & Extensions.
 
 The helper accepts only this app's bundle identifier signed by the same Apple signing team. The app also validates the helper's signature. IPC exposes set-target, restore, ping, and heartbeat; it exposes no arbitrary key writes, shell commands, or filesystem paths.
 

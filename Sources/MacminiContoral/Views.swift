@@ -158,7 +158,7 @@ struct MenuPanel: View {
     @Environment(\.openWindow) private var openWindow
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Text("Macmini contoral").font(.title3.weight(.semibold))
+            Text("風扇管理 Fan Control").font(.title3.weight(.semibold))
             VStack(spacing: 13) {
                 metric("目前轉速", icon: "fanblades", value: "\(Format.rpm(model.usableFan?.rpm)) RPM")
                 metric("CPU 平均", icon: "thermometer.medium", value: Format.temperature(model.isStale ? nil : model.snapshot?.cpu.average))

@@ -12,12 +12,12 @@ import AppKit
     }
 }
 
-@main struct MacminiContoralApp: App {
+@main struct FanControlApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var model = MonitorModel.shared
     @AppStorage("showMenuBarTrend") private var showMenuBarTrend = true
     var body: some Scene {
-        Window("主機管理-Macmini contoral", id: "monitor") {
+        Window("風扇管理 Fan Control", id: "monitor") {
             MonitorView(model: model, control: model.control)
                 .task { model.start() }
         }
@@ -39,7 +39,7 @@ import AppKit
                     Image(nsImage: MenuBarTrendIcon.image(for: model.menuTrend))
                 } else { Image(systemName: "fanblades") }
             }
-                .accessibilityLabel("Macmini contoral，風扇轉速、CPU 溫度與最近一分鐘轉速走勢")
+                .accessibilityLabel("風扇管理 Fan Control，風扇轉速、CPU 溫度與最近一分鐘轉速走勢")
                 .accessibilityValue("\(Format.rpm(model.usableFan?.rpm)) RPM，CPU \(Format.temperature(model.isStale ? nil : model.snapshot?.cpu.average))，GPU \(Format.temperature(model.isStale ? nil : model.snapshot?.gpu.average))")
         }
         .menuBarExtraStyle(.window)
