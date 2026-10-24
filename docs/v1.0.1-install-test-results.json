@@ -1,0 +1,146 @@
+{
+  "version": "1.0.1",
+  "build": "2",
+  "installed_path": "/Users/server/Applications/Macmini contoral.app",
+  "source_dmg_sha256": "dd49eafe88fd472299ce97758cfd756609790802a457dcffe76a1f36b7d575ad",
+  "ui_entry_tested": "main_window_toolbar_shared_MenuPanel",
+  "status_bar_entry_tested": false,
+  "steps": [
+    {
+      "name": "automatic-installed",
+      "samples": 10,
+      "start_utc": "2026-10-24T09:50:02Z",
+      "end_utc": "2026-10-24T09:50:11Z",
+      "rpm_range": [
+        999,
+        1001
+      ],
+      "target_rpm": [
+        1000
+      ],
+      "mode": [
+        0
+      ],
+      "cpu_c_range": [
+        55.73,
+        57.3
+      ],
+      "gpu_c_range": [
+        48.9,
+        49.35
+      ],
+      "thermal_states": [
+        0
+      ]
+    },
+    {
+      "name": "toolbar-manual-1500",
+      "samples": 15,
+      "start_utc": "2026-10-24T09:52:05Z",
+      "end_utc": "2026-10-24T09:52:19Z",
+      "rpm_range": [
+        1499,
+        1501
+      ],
+      "target_rpm": [
+        1500
+      ],
+      "mode": [
+        1
+      ],
+      "cpu_c_range": [
+        56.38,
+        58.09
+      ],
+      "gpu_c_range": [
+        49.31,
+        50.24
+      ],
+      "thermal_states": [
+        0
+      ]
+    },
+    {
+      "name": "toolbar-manual-2000",
+      "samples": 15,
+      "start_utc": "2026-10-24T09:52:41Z",
+      "end_utc": "2026-10-24T09:52:56Z",
+      "rpm_range": [
+        1999,
+        2002
+      ],
+      "target_rpm": [
+        2000
+      ],
+      "mode": [
+        1
+      ],
+      "cpu_c_range": [
+        55.56,
+        57.06
+      ],
+      "gpu_c_range": [
+        48.11,
+        49.76
+      ],
+      "thermal_states": [
+        0
+      ]
+    },
+    {
+      "name": "toolbar-step-down-1500",
+      "samples": 10,
+      "start_utc": "2026-10-24T09:53:28Z",
+      "end_utc": "2026-10-24T09:53:38Z",
+      "rpm_range": [
+        1499,
+        1501
+      ],
+      "target_rpm": [
+        1500
+      ],
+      "mode": [
+        1
+      ],
+      "cpu_c_range": [
+        54.26,
+        55.94
+      ],
+      "gpu_c_range": [
+        47.16,
+        47.65
+      ],
+      "thermal_states": [
+        0
+      ]
+    },
+    {
+      "name": "automatic-restored",
+      "samples": 15,
+      "start_utc": "2026-10-24T09:53:49Z",
+      "end_utc": "2026-10-24T09:54:03Z",
+      "rpm_range": [
+        999,
+        1002
+      ],
+      "target_rpm": [
+        1000
+      ],
+      "mode": [
+        0
+      ],
+      "cpu_c_range": [
+        53.9,
+        55.5
+      ],
+      "gpu_c_range": [
+        47.08,
+        47.66
+      ],
+      "thermal_states": [
+        0
+      ]
+    }
+  ],
+  "final_automatic_verified": true
+}
