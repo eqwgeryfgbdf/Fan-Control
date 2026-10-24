@@ -49,6 +49,20 @@ private final class ReplyGate: @unchecked Sendable {
         }
     }
     func openApproval() { SMAppService.openSystemSettingsLoginItems() }
+    func restartService() async {
+        guard !busy, !ownsManual else { return }
+        busy = true; message = nil
+        defer { busy = false; refreshStatus() }
+        disconnect()
+        do {
+            try await service.unregister()
+            // ServiceManagement can acknowledge unregister before launchd has
+            // completed removal; allow that operation to settle before registering.
+            try await Task.sleep(for: .seconds(1))
+            try await Task.detached { try SMAppService.daemon(plistName: ServiceIdentity.plist).register() }.value
+            message = "控制服務已重新啟動。"
+        } catch { message = "無法重新啟動控制服務：\(error.localizedDescription)" }
+    }
     private func connect() throws -> NSXPCConnection {
         refreshStatus()
         guard enabled else { throw MonitorError.message("請先啟用風扇控制服務。") }

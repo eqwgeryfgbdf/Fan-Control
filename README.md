@@ -8,7 +8,9 @@ Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected v
 
 ![主視窗實機截圖](docs/main-window.png)
 
-目前已驗證 M4 的即時監測。使用者選擇稍後授權，因此實機調速與恢復自動仍待驗證；macOS 15、Intel 與其他機型尚未完成實機測試。
+v1.0.1 包含風扇控制服務啟動及韌體回讀延遲修正，已於 2026-10-24 在 M4 Mac mini 驗證即時監測、1,500／2,000 RPM 手動調速、降速及恢復自動，見 [手動控制實機測試](docs/manual-control-validation-2026-10-24.md)。macOS 15、Intel 與其他機型尚未完成實機測試。
+
+從 [v1.0.1 Release](https://github.com/eqwgeryfgbdf/MacminiContoral/releases/tag/v1.0.1) 下載 Universal DMG；私有倉庫需要登入具有存取權的 GitHub 帳號。
 
 ## Features
 
@@ -24,10 +26,13 @@ Requires Xcode 26 or newer and a valid Apple Development or Developer ID signing
 
 ```sh
 ./scripts/build-app.sh
+./scripts/package-dmg.sh
 open 'dist/Macmini contoral.app'
 ```
 
 The script builds arm64 and x86_64, combines both into universal app/helper executables, embeds the launch daemon, and signs the bundle. Override `SIGNING_IDENTITY` to select a different signing certificate. The minimum OS is encoded as 15.0 in both binary architectures and Info.plist.
+
+The default version is 1.0.1 (build 2); `APP_VERSION` and `BUILD_NUMBER` can override it. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG.
 
 Install the app in `/Applications` or your `~/Applications` folder before enabling the control service. The local deliverable uses development signing; it is not a notarized public release.
 
@@ -36,6 +41,8 @@ Install the app in `/Applications` or your `~/Applications` folder before enabli
 Monitoring needs no administrator permission. Choose **啟用風扇控制** in the menu panel or Settings to register the bundled helper with Apple's `SMAppService`. macOS may request administrator authentication and approval under System Settings → General → Login Items & Extensions. The application does not collect or save an administrator password.
 
 After approval, choose Manual, select a target within the firmware-reported range, and Apply. The target setting and actual fan speed are displayed separately. A successful write is reported only after mode and target readback; physical RPM can take time to settle.
+
+When upgrading, restore automatic control and quit the old app before replacing it. Launch the new copy from Applications and choose **重新啟動控制服務** in Settings to load the updated helper. If macOS requests approval again, complete it in Login Items & Extensions.
 
 The helper accepts only this app's bundle identifier signed by the same Apple signing team. The app also validates the helper's signature. IPC exposes set-target, restore, ping, and heartbeat; it exposes no arbitrary key writes, shell commands, or filesystem paths.
 

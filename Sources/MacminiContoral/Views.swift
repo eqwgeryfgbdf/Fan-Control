@@ -262,6 +262,9 @@ struct SettingsView: View {
                     Button(control.requiresApproval ? "開啟系統設定" : "啟用風扇控制") {
                         if control.requiresApproval { control.openApproval() } else { Task { await control.register() } }
                     }.disabled(control.busy)
+                } else {
+                    Button("重新啟動控制服務") { Task { await control.restartService() } }
+                        .disabled(control.busy || control.ownsManual)
                 }
                 Text("App 結束、控制連線中斷或系統過熱時，控制服務會恢復自動調節。").font(.caption).foregroundStyle(.secondary)
             }

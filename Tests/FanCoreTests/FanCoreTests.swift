@@ -7,7 +7,19 @@ final class FakeSMC: FanHardware {
     var failedKey: String?
     var failedRestorationKey: String?
     var requiresUnlock = false
+    var staleTargetReadsAfterWrite = 0
+    private var staleTargetReads = 0
+    var staleModeReadsAfterRestore = 0
+    private var staleModeReads = 0
     func read(_ key: String) throws -> Double {
+        if key == "F0Md", staleModeReads > 0 {
+            staleModeReads -= 1
+            return 1
+        }
+        if key == "F0Tg", staleTargetReads > 0 {
+            staleTargetReads -= 1
+            return 1000
+        }
         guard let v = values[key] else { throw MonitorError.message("missing") }; return v
     }
     func write(_ key: String, value: Double) throws {
@@ -16,6 +28,8 @@ final class FakeSMC: FanHardware {
         if key == failedKey && value != 0 { throw MonitorError.message("injected failure") }
         if requiresUnlock && key == "F0Md" && value == 1 && values["Ftst"] != 1 { throw MonitorError.message("locked") }
         values[key] = value
+        if key == "F0Tg", value != 0 { staleTargetReads = staleTargetReadsAfterWrite }
+        if key == "F0Md", value == 0 { staleModeReads = staleModeReadsAfterRestore }
     }
     func modeKey(_ id: Int) -> String { "F\(id)Md" }
     func fan(_ id: Int) -> FanReading {
@@ -24,6 +38,36 @@ final class FakeSMC: FanHardware {
 }
 
 final class FanCoreTests: XCTestCase {
+    func testRestoreWaitsForAutomaticModeReadback() throws {
+        let hardware = FakeSMC(); hardware.staleModeReadsAfterRestore = 3
+        var waits = 0
+        let controller = FanController(hardware: hardware, appleSilicon: true, persist: { _ in }, delay: { _ in waits += 1 })
+        try controller.manual(fan: 0, rpm: 1500)
+        try controller.restore()
+        XCTAssertEqual(waits, 3)
+        XCTAssertFalse(controller.needsRecovery)
+        XCTAssertEqual(hardware.values["F0Md"], 0)
+    }
+    func testUnconfirmedManualReadbackTimesOutAndRestoresAutomatic() throws {
+        let hardware = FakeSMC(); hardware.staleTargetReadsAfterWrite = 30
+        var waits = 0
+        let controller = FanController(hardware: hardware, appleSilicon: true, persist: { _ in }, delay: { _ in waits += 1 })
+        XCTAssertThrowsError(try controller.manual(fan: 0, rpm: 1500))
+        XCTAssertEqual(waits, 20)
+        XCTAssertFalse(controller.needsRecovery)
+        XCTAssertEqual(hardware.values["F0Md"], 0)
+    }
+    func testManualWaitsForFirmwareReadbackWithoutRepeatingWrites() throws {
+        let hardware = FakeSMC(); hardware.staleTargetReadsAfterWrite = 3
+        var waits = 0
+        let controller = FanController(hardware: hardware, appleSilicon: true, persist: { _ in }, delay: { _ in waits += 1 })
+        try controller.manual(fan: 0, rpm: 1500)
+        XCTAssertEqual(waits, 3)
+        XCTAssertEqual(hardware.writes.filter { $0.0 == "F0Tg" }.count, 1)
+        XCTAssertTrue(controller.needsRecovery)
+        try controller.restore()
+        XCTAssertFalse(controller.needsRecovery)
+    }
     func testDecodersPreserveZeroAndSignedTemperatures() throws {
         XCTAssertEqual(try SMC.decode(type: "flt ", bytes: [0, 0, 122, 68]), 1000)
         XCTAssertEqual(try SMC.decode(type: "fpe2", bytes: [0x0f, 0xa0]), 1000)
