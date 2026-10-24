@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "MacminiContoral",
+    name: "FanControl",
     platforms: [.macOS(.v15)],
     products: [
         .executable(name: "MacminiContoral", targets: ["MacminiContoral"]),

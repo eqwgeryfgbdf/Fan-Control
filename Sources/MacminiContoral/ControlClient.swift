@@ -37,13 +37,13 @@ private final class ReplyGate: @unchecked Sendable {
             try await Task.detached { try SMAppService.daemon(plistName: ServiceIdentity.plist).register() }.value
             refreshStatus()
             if requiresApproval {
-                message = "請在系統設定的登入項目中允許 Macmini contoral。"
+                message = "請在系統設定的登入項目中允許 風扇管理 Fan Control。"
                 SMAppService.openSystemSettingsLoginItems()
             }
         } catch {
             refreshStatus()
             if requiresApproval {
-                message = "請在系統設定的登入項目中允許 Macmini contoral。"
+                message = "請在系統設定的登入項目中允許 風扇管理 Fan Control。"
                 SMAppService.openSystemSettingsLoginItems()
             } else { message = "無法啟用控制服務：\(error.localizedDescription)" }
         }

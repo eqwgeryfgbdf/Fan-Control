@@ -1,0 +1,37 @@
+{
+  "version": "1.0.2",
+  "build": "4",
+  "display_name": "風扇管理 Fan Control",
+  "bundle_name": "風扇管理 Fan Control.app",
+  "dmg": "Fan-Control-1.0.2-macos-universal.dmg",
+  "bytes": 3711089,
+  "sha256": "2d7579ef412b0cc12705e50bace6167f98b92498441e7e91f9740ac3392321a4",
+  "checksum_asset_sha256": "edf545bda243a4cda0b19798848a758501f3f6f916942a2304c8a16a8b1f0218",
+  "signature_verified": true,
+  "mounted_files_match_build": true,
+  "files_verified": 7,
+  "contents": [
+    "Applications",
+    "安裝說明.txt",
+    "風扇管理 Fan Control.app"
+  ],
+  "binaries": {
+    "MacminiContoral": {
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "sha256": "50f6e4e13fee6a987d5e4935cf391d3070187746f798751348650880f0c7e761",
+      "minimum_os": "15.0"
+    },
+    "MacminiHelper": {
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "sha256": "4847224b6835abbb1029945f8dbe7aa7405225c554032d7b261e182fa721baec",
+      "minimum_os": "15.0"
+    }
+  },
+  "unit_tests": 17
+}
