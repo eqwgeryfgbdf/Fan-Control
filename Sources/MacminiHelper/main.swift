@@ -1,6 +1,7 @@
 import Foundation
 import FanCore
 import os
+import MachO
 
 private let log = Logger(subsystem: ServiceIdentity.helper, category: "control")
 private let queue = DispatchQueue(label: "local.macmini.contoral.hardware")
@@ -97,13 +98,28 @@ final class ListenerDelegate: NSObject, NSXPCListenerDelegate {
     }
 }
 
-guard geteuid() == 0 else { fputs("This service must be launched by macOS ServiceManagement.\n", stderr); exit(1) }
-let bundleURL = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+// launchd may supply a relative BundleProgram as argv[0]. Resolve the loaded
+// executable through dyld instead of interpreting argv[0] against its cwd.
+var executablePathSize: UInt32 = 0
+_ = _NSGetExecutablePath(nil, &executablePathSize)
+var executablePath = [CChar](repeating: 0, count: Int(executablePathSize))
+guard _NSGetExecutablePath(&executablePath, &executablePathSize) == 0 else {
+    fputs("Unable to resolve the helper executable.\n", stderr); exit(1)
+}
+let bundleURL = URL(fileURLWithPath: String(cString: executablePath)).resolvingSymlinksInPath()
+    .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
 guard let bundle = Bundle(url: bundleURL),
+      bundle.bundleIdentifier == ServiceIdentity.app,
       let team = bundle.object(forInfoDictionaryKey: "MacminiSigningTeam") as? String,
       team.range(of: "^[A-Z0-9]{10}$", options: .regularExpression) != nil else {
     fputs("Missing signing identity.\n", stderr); exit(1)
 }
+// A read-only packaging check; it never opens SMC or starts the control service.
+if CommandLine.arguments.dropFirst().contains("--validate-installation") {
+    print("Validated helper bundle: \(bundleURL.path)")
+    exit(0)
+}
+guard geteuid() == 0 else { fputs("This service must be launched by macOS ServiceManagement.\n", stderr); exit(1) }
 do {
     let state = try ServiceState()
     let delegate = ListenerDelegate(state: state)

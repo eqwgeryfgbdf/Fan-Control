@@ -1,0 +1,86 @@
+{
+  "baseline": {
+    "samples": 3,
+    "from": "2026-10-24T03:56:04Z",
+    "to": "2026-10-24T03:56:06Z",
+    "rpm_min": 1000,
+    "rpm_max": 1000,
+    "mode_values": [
+      0
+    ],
+    "target_values": [
+      1000
+    ],
+    "thermal_states": [
+      0
+    ]
+  },
+  "manual-1500": {
+    "samples": 20,
+    "from": "2026-10-24T03:59:35Z",
+    "to": "2026-10-24T03:59:54Z",
+    "rpm_min": 1498,
+    "rpm_max": 1501,
+    "mode_values": [
+      1
+    ],
+    "target_values": [
+      1500
+    ],
+    "thermal_states": [
+      0
+    ]
+  },
+  "manual-2000-final": {
+    "samples": 20,
+    "from": "2026-10-24T04:02:07Z",
+    "to": "2026-10-24T04:02:26Z",
+    "rpm_min": 1997,
+    "rpm_max": 2002,
+    "mode_values": [
+      1
+    ],
+    "target_values": [
+      2000
+    ],
+    "thermal_states": [
+      0
+    ]
+  },
+  "manual-step-down-1500-final": {
+    "samples": 10,
+    "from": "2026-10-24T04:02:49Z",
+    "to": "2026-10-24T04:02:58Z",
+    "rpm_min": 1498,
+    "rpm_max": 1502,
+    "mode_values": [
+      1
+    ],
+    "target_values": [
+      1500
+    ],
+    "thermal_states": [
+      0
+    ]
+  },
+  "automatic-final": {
+    "samples": 15,
+    "from": "2026-10-24T04:03:28Z",
+    "to": "2026-10-24T04:03:43Z",
+    "rpm_min": 999,
+    "rpm_max": 1001,
+    "mode_values": [
+      0
+    ],
+    "target_values": [
+      1000
+    ],
+    "thermal_states": [
+      0
+    ]
+  },
+  "installed_binary_sha256": {
+    "MacminiContoral": "28900eb1af36e6caeb418fa3bd587e7911a4fe46af8987db0273d619aa581629",
+    "MacminiHelper": "99d62902cbc66757e9eed442abfe211518ff02eb32f0d47a45df6e8ed5dd1188"
+  }
+}

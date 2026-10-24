@@ -64,10 +64,16 @@ public final class FanController {
                 try hardware.write("FS! ", value: Double(mask))
             }
             try retryWrite("F\(id)Tg", value: rpm)
-            let target = try hardware.read("F\(id)Tg")
-            let actualMode = try hardware.read(mode)
+            var target = try hardware.read("F\(id)Tg")
+            var actualMode = try hardware.read(mode)
+            // Some firmware acknowledges a write before publishing its new value.
+            for _ in 0..<20 where abs(target - rpm) > 5 || actualMode != 1 {
+                delay(0.05)
+                target = try hardware.read("F\(id)Tg")
+                actualMode = try hardware.read(mode)
+            }
             guard abs(target - rpm) <= 5, actualMode == 1 else {
-                throw MonitorError.message("風扇未確認目標設定，已要求恢復自動調節。")
+                throw MonitorError.message("風扇未確認目標設定（回讀 \(target) RPM，模式 \(actualMode)），已要求恢復自動調節。")
             }
         } catch {
             let original = error
@@ -89,7 +95,11 @@ public final class FanController {
                     let mask = Int(try hardware.read("FS! ")) & ~(1 << id)
                     try hardware.write("FS! ", value: Double(mask))
                 }
-                let value = try hardware.read(mode)
+                var value = try hardware.read(mode)
+                for _ in 0..<20 where value != 0 && value != 3 {
+                    delay(0.05)
+                    value = try hardware.read(mode)
+                }
                 guard value == 0 || value == 3 else { throw MonitorError.message("風扇仍處於手動模式。") }
                 journal.fans.remove(id)
                 try persist(journal)

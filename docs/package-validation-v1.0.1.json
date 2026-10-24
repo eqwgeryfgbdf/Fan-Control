@@ -1,0 +1,32 @@
+{
+  "version": "1.0.1",
+  "build": "2",
+  "dmg": "Macmini-contoral-1.0.1-macos-universal.dmg",
+  "bytes": 3251078,
+  "sha256": "dd49eafe88fd472299ce97758cfd756609790802a457dcffe76a1f36b7d575ad",
+  "signature_verified": true,
+  "mounted_files_match_build": true,
+  "contents": [
+    "Applications",
+    "Macmini contoral.app",
+    "安裝說明.txt"
+  ],
+  "binaries": {
+    "MacminiContoral": {
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "sha256": "7b1ef082f1e39a5d4bb34181a6e08ddaa778bc65e17f25e9cf8fad2816be6316",
+      "minimum_os": "15.0"
+    },
+    "MacminiHelper": {
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "sha256": "81d775d8afb74c6435e28fb84834dc65ef95b074a98aa814f3c06a800e29ede1",
+      "minimum_os": "15.0"
+    }
+  }
+}
