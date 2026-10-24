@@ -1,0 +1,128 @@
+{
+  "version": "1.0.2",
+  "build": "4",
+  "date": "2026-10-24",
+  "timezone": "Asia/Taipei",
+  "installed_path": "/Users/server/Applications/風扇管理 Fan Control.app",
+  "dmg_sha256": "2d7579ef412b0cc12705e50bace6167f98b92498441e7e91f9740ac3392321a4",
+  "installed_files_verified": 7,
+  "helper_parent_bundle_version": "4",
+  "helper_running": true,
+  "ui_entry_tested": "main_window_toolbar_shared_MenuPanel",
+  "menu_bar_entry_tested": false,
+  "menu_bar_entry_status": "Awaiting user to open the macOS status item; tool only exposes the main window while closed.",
+  "mini_chart_setting_enabled": true,
+  "final_hardware_mode": "automatic",
+  "code_changes": false,
+  "github_pushed": false,
+  "phases": [
+    {
+      "phase": "baseline",
+      "sample_count": 5,
+      "first_sample": "2026-10-24T13:10:34Z",
+      "last_sample": "2026-10-24T13:10:38Z",
+      "rpm_min": 999,
+      "rpm_max": 1001,
+      "modes": [
+        0
+      ],
+      "targets": [
+        1000
+      ],
+      "cpu_c_min": 49.72516632080078,
+      "cpu_c_max": 50.89424705505371,
+      "gpu_c_min": 43.31718921661377,
+      "gpu_c_max": 43.47868347167969,
+      "cpu_sensor_counts": [
+        12
+      ],
+      "gpu_sensor_counts": [
+        8
+      ],
+      "thermal_states": [
+        0
+      ]
+    },
+    {
+      "phase": "shared-manual-2000",
+      "sample_count": 15,
+      "first_sample": "2026-10-24T13:12:59Z",
+      "last_sample": "2026-10-24T13:13:13Z",
+      "rpm_min": 1997,
+      "rpm_max": 2002,
+      "modes": [
+        1
+      ],
+      "targets": [
+        2000
+      ],
+      "cpu_c_min": 49.93990961710612,
+      "cpu_c_max": 52.04815355936686,
+      "gpu_c_min": 43.03129196166992,
+      "gpu_c_max": 43.739633560180664,
+      "cpu_sensor_counts": [
+        12
+      ],
+      "gpu_sensor_counts": [
+        8
+      ],
+      "thermal_states": [
+        0
+      ]
+    },
+    {
+      "phase": "shared-manual-1500",
+      "sample_count": 10,
+      "first_sample": "2026-10-24T13:14:11Z",
+      "last_sample": "2026-10-24T13:14:20Z",
+      "rpm_min": 1498,
+      "rpm_max": 1501,
+      "modes": [
+        1
+      ],
+      "targets": [
+        1500
+      ],
+      "cpu_c_min": 48.92544142405192,
+      "cpu_c_max": 50.29212919871012,
+      "gpu_c_min": 42.12847900390625,
+      "gpu_c_max": 42.49134349822998,
+      "cpu_sensor_counts": [
+        12
+      ],
+      "gpu_sensor_counts": [
+        8
+      ],
+      "thermal_states": [
+        0
+      ]
+    },
+    {
+      "phase": "shared-restored-auto",
+      "sample_count": 10,
+      "first_sample": "2026-10-24T13:14:31Z",
+      "last_sample": "2026-10-24T13:14:40Z",
+      "rpm_min": 999,
+      "rpm_max": 1002,
+      "modes": [
+        0
+      ],
+      "targets": [
+        1000
+      ],
+      "cpu_c_min": 48.92530536651611,
+      "cpu_c_max": 50.26013469696045,
+      "gpu_c_min": 42.34052562713623,
+      "gpu_c_max": 42.65475559234619,
+      "cpu_sensor_counts": [
+        12
+      ],
+      "gpu_sensor_counts": [
+        8
+      ],
+      "thermal_states": [
+        0
+      ]
+    }
+  ]
+}
