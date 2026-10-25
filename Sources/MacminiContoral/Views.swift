@@ -156,8 +156,11 @@ struct MenuPanel: View {
     @ObservedObject var model: MonitorModel
     @ObservedObject var control: ControlClient
     @Environment(\.openWindow) private var openWindow
+    @State private var rpmInput = ""
+    private var enteredRPM: Double? { model.usableFan.flatMap { FanQuickControl.parse(rpmInput, for: $0) } }
+    private var canApply: Bool { control.canApply && !model.isStale && (model.snapshot?.thermalState ?? 2) < 2 }
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 14) {
             Text("風扇管理 Fan Control").font(.title3.weight(.semibold))
             VStack(spacing: 13) {
                 metric("目前轉速", icon: "fanblades", value: "\(Format.rpm(model.usableFan?.rpm)) RPM")
@@ -204,8 +207,10 @@ struct MenuPanel: View {
                 Button("結束") { NSApp.terminate(nil) }.buttonStyle(.plain).font(.caption).foregroundStyle(.secondary)
             }
         }
-        .padding(22)
+        .padding(18)
         .frame(width: 380)
+        .onAppear { rpmInput = String(Int(model.targetRPM)) }
+        .onChange(of: model.targetRPM) { _, rpm in rpmInput = String(Int(rpm)) }
     }
     private func metric(_ title: String, icon: String, value: String) -> some View {
         HStack(spacing: 10) {
@@ -216,7 +221,7 @@ struct MenuPanel: View {
         }
     }
     private var controls: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             Picker("控制模式", selection: Binding(get: { model.manualSelection }, set: { manual in
                 if manual { model.manualSelection = true }
                 else { Task { await model.automatic() } }
@@ -230,18 +235,42 @@ struct MenuPanel: View {
                 HStack {
                     Text("目標轉速")
                     Spacer()
-                    Text("\(Format.rpm(model.targetRPM)) RPM").monospacedDigit()
-                    Text(control.ownsManual && abs((fan.target ?? -1)-model.targetRPM) < 5 ? "已套用" : "未套用")
+                    TextField("RPM", text: $rpmInput)
+                        .textFieldStyle(.roundedBorder).multilineTextAlignment(.trailing).frame(width: 80)
+                        .accessibilityLabel("輸入目標轉速，RPM")
+                        .onSubmit { if canApply, let rpm = enteredRPM { Task { await model.apply(rpm: rpm) } } }
+                    Text("RPM").font(.caption).foregroundStyle(.secondary)
+                    Text(control.ownsManual && control.ownedFans.contains(fan.id) && abs((fan.target ?? -1)-(enteredRPM ?? -1000)) < 5 ? "已套用" : "未套用")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 VStack(spacing: 6) {
-                    Slider(value: $model.targetRPM, in: minimum...maximum, step: 50).accessibilityLabel("目標風扇轉速")
+                    Slider(value: Binding(get: { model.targetRPM }, set: {
+                        model.targetRPM = $0; rpmInput = String(Int($0))
+                    }), in: minimum...maximum, step: 50).accessibilityLabel("目標風扇轉速")
                         .disabled(control.busy)
                     HStack { Text("\(Format.rpm(minimum)) RPM"); Spacer(); Text("\(Format.rpm(maximum)) RPM") }
                         .font(.caption).foregroundStyle(.secondary).monospacedDigit()
                 }
+                if enteredRPM == nil {
+                    Text("請輸入 \(Int(minimum))–\(Int(maximum)) 的整數轉速。")
+                        .font(.caption).foregroundStyle(.orange)
+                }
+                let presets = FanQuickControl.presets(for: fan)
+                if !presets.isEmpty {
+                    HStack(spacing: 6) {
+                        Text("快速套用").font(.caption).foregroundStyle(.secondary)
+                        ForEach(presets, id: \.self) { rpm in
+                            Button("\(Int(rpm))") {
+                                rpmInput = String(Int(rpm))
+                                Task { await model.apply(rpm: rpm) }
+                            }.help("立即套用 \(Int(rpm)) RPM").accessibilityLabel("快速套用 \(Int(rpm)) RPM")
+                                .buttonStyle(.bordered).controlSize(.small)
+                        }
+                    }.disabled(!canApply)
+                }
                 HStack {
-                    Button("套用轉速") { Task { await model.apply() } }.buttonStyle(.borderedProminent).disabled(!control.canApply)
+                    Button("套用轉速") { if let rpm = enteredRPM { Task { await model.apply(rpm: rpm) } } }
+                        .buttonStyle(.borderedProminent).disabled(!canApply || enteredRPM == nil)
                     Button("恢復自動調節") { Task { await model.automatic() } }.buttonStyle(.bordered).disabled(!control.canRestore)
                 }.disabled(control.busy)
             } else if model.manualSelection {
@@ -259,6 +288,9 @@ struct SettingsView: View {
     @State private var loginEnabled = SMAppService.mainApp.status == .enabled
     @State private var loginError: String?
     @AppStorage("showMenuBarTrend") private var showMenuBarTrend = true
+    @AppStorage("menuBarShowsRPM") private var menuBarShowsRPM = true
+    @AppStorage("menuBarShowsCPU") private var menuBarShowsCPU = true
+    @AppStorage("menuBarShowsGPU") private var menuBarShowsGPU = true
     var body: some View {
         Form {
             Section("一般") {
@@ -282,9 +314,14 @@ struct SettingsView: View {
                 }
                 Text("App 結束、控制連線中斷、讀值持續失效或系統過熱時，控制服務會恢復自動調節。").font(.caption).foregroundStyle(.secondary)
             }
-            Section("顯示與感測器") {
+            Section("選單列") {
+                Toggle("顯示風扇轉速", isOn: $menuBarShowsRPM)
+                Toggle("顯示 CPU 溫度", isOn: $menuBarShowsCPU)
+                Toggle("顯示 GPU 溫度", isOn: $menuBarShowsGPU)
                 Toggle("選單列顯示迷你走勢圖", isOn: $showMenuBarTrend)
-                Text("顯示最近一分鐘的實際轉速；展開選單列可查看完整走勢。").font(.caption).foregroundStyle(.secondary)
+                Text("可依選單列空間選擇顯示項目。關閉所有數字時保留圖示；展開後仍能查看完整讀值與最近一分鐘走勢。").font(.caption).foregroundStyle(.secondary)
+            }
+            Section("感測器") {
                 LabeledContent("更新頻率", value: "每秒一次")
                 LabeledContent("CPU 感測器", value: "\(model.snapshot?.cpu.sensorCount ?? 0) 個")
                 LabeledContent("GPU 感測器", value: "\(model.snapshot?.gpu.sensorCount ?? 0) 個")

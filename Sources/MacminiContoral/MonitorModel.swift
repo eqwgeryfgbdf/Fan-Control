@@ -67,10 +67,13 @@ import FanCore
         if ticks % 3 == 0 { control.heartbeat() }
         if ticks % 5 == 0 { control.refreshStatus() }
     }
-    func apply() async {
-        guard let fan = usableFan else { return }
-        do { try ControlPolicy.validate(rpm: targetRPM, fan: fan) }
+    func apply(rpm: Double? = nil) async {
+        guard control.canApply else { control.message = "控制服務尚未就緒，請先確認服務狀態。"; return }
+        guard let fan = usableFan else { control.message = "讀值尚未更新，暫時無法調速。"; return }
+        let requestedRPM = rpm ?? targetRPM
+        do { try ControlPolicy.validate(rpm: requestedRPM, fan: fan) }
         catch { control.message = error.localizedDescription; return }
+        targetRPM = requestedRPM
         await control.apply(fan: fan.id, rpm: targetRPM.rounded())
     }
     func automatic() async {

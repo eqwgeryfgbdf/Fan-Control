@@ -16,6 +16,16 @@ import AppKit
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var model = MonitorModel.shared
     @AppStorage("showMenuBarTrend") private var showMenuBarTrend = true
+    @AppStorage("menuBarShowsRPM") private var menuBarShowsRPM = true
+    @AppStorage("menuBarShowsCPU") private var menuBarShowsCPU = true
+    @AppStorage("menuBarShowsGPU") private var menuBarShowsGPU = true
+    private var menuBarText: String {
+        var parts: [String] = []
+        if menuBarShowsRPM { parts.append("\(Format.rpm(model.usableFan?.rpm)) RPM") }
+        if menuBarShowsCPU { parts.append("CPU \(Format.temperature(model.isStale ? nil : model.snapshot?.cpu.average))") }
+        if menuBarShowsGPU { parts.append("GPU \(Format.temperature(model.isStale ? nil : model.snapshot?.gpu.average))") }
+        return parts.joined(separator: " · ")
+    }
     var body: some Scene {
         Window("風扇管理 Fan Control", id: "monitor") {
             MonitorView(model: model, control: model.control)
@@ -32,14 +42,14 @@ import AppKit
             MenuPanel(model: model, control: model.control).task { model.start() }
         } label: {
             Label {
-                Text("\(Format.rpm(model.usableFan?.rpm)) RPM · \(Format.temperature(model.isStale ? nil : model.snapshot?.cpu.average))")
+                Text(menuBarText)
                     .monospacedDigit()
             } icon: {
                 if showMenuBarTrend, !model.isStale, !model.menuTrend.points.isEmpty {
                     Image(nsImage: MenuBarTrendIcon.image(for: model.menuTrend))
                 } else { Image(systemName: "fanblades") }
             }
-                .accessibilityLabel("風扇管理 Fan Control，風扇轉速、CPU 溫度與最近一分鐘轉速走勢")
+                .accessibilityLabel("風扇管理 Fan Control，即時風扇與溫度監測")
                 .accessibilityValue("\(Format.rpm(model.usableFan?.rpm)) RPM，CPU \(Format.temperature(model.isStale ? nil : model.snapshot?.cpu.average))，GPU \(Format.temperature(model.isStale ? nil : model.snapshot?.gpu.average))")
         }
         .menuBarExtraStyle(.window)

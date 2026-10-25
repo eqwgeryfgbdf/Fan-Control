@@ -4,6 +4,8 @@ Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected v
 
 原生 macOS 選單列風扇與溫度監測工具。可即時查看風扇轉速、CPU／GPU 感測器平均溫度及最近 15 分鐘趨勢，並在管理員授權後使用快速調速控制。支援 macOS 15 以上，macOS 26 以上適量採用 Liquid Glass。
 
+目前原始碼為 **v1.0.3（build 5）本地開發版**：加入感測器失效保護、控制服務連線與版本確認、選單列 RPM／CPU／GPU 個別顯示開關、常用轉速快捷鍵與整數轉速輸入。尚未發布或替換已安裝的 v1.0.2；驗證範圍見 [本地改善紀錄](docs/v1.0.3-local-improvements.md)。
+
 [繁體中文使用說明](docs/使用說明.md) · [實機驗證紀錄](docs/validation.md)
 
 ![主視窗實機截圖](docs/main-window.png)
@@ -19,7 +21,7 @@ v1.0.2（build 4）正式更名為「風扇管理 Fan Control」，新增選單�
 ## Features
 
 - A chart-focused main window with 1, 5, and 15 minute history, per-fan actual RPM, firmware limits, and current mode.
-- A persistent menu bar item showing actual RPM, CPU temperature, and an optional monochrome one-minute sparkline. The panel also shows GPU temperature, a one-minute RPM chart, manual target selection, Apply, and Restore Automatic.
+- A persistent menu bar item with individually configurable RPM, CPU and GPU temperatures, and an optional monochrome one-minute sparkline. The panel includes a one-minute RPM chart, validated integer input, hardware-filtered 1,500/2,000/2,500 RPM quick actions, Apply, and Restore Automatic.
 - Menu bar trends keep updating when the main chart is paused. Missing readings remain gaps; the chart shows real samples only, with a minimum 200 RPM vertical span to avoid amplifying minor sensor noise. The mini sparkline can be turned off in Settings.
 - Real readings sampled once per second off the main thread. Pausing the chart does not pause sensor readings or control heartbeats. History stays in memory and is not uploaded.
 - macOS 26+ uses the native toolbar appearance and one regular Liquid Glass surface for the interactive fan controls. macOS 15 uses standard material. Reduce Transparency uses an opaque control surface. Data and charts never use custom glass.
@@ -37,7 +39,7 @@ open 'dist/風扇管理 Fan Control.app'
 
 The script builds arm64 and x86_64, combines both into universal app/helper executables, embeds the launch daemon, and signs the bundle. Override `SIGNING_IDENTITY` to select a different signing certificate. The minimum OS is encoded as 15.0 in both binary architectures and Info.plist.
 
-The default version is 1.0.2 (build 4). `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG.
+The default local development version is 1.0.3 (build 5). `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG. The currently published download remains v1.0.2 until an explicit release is requested.
 
 Install the app in `/Applications` or your `~/Applications` folder before enabling the control service. The local deliverable uses development signing; it is not a notarized public release.
 
@@ -47,11 +49,15 @@ Monitoring needs no administrator permission. Choose **啟用風扇控制** in t
 
 After approval, choose Manual, select a target within the firmware-reported range, and Apply. The target setting and actual fan speed are displayed separately. A successful write is reported only after mode and target readback; physical RPM can take time to settle.
 
+In v1.0.3, authorization alone does not enable writes. The app verifies the running helper's protocol, version and build first. An older helper shows an update prompt and monitoring remains available. Recovery status stays pending until the helper confirms restoration; the UI also displays the hardware's actual mode separately from the target editor.
+
 When upgrading, restore automatic control and quit the old app before replacing it. Version 1.0.2 renames the app bundle to `風扇管理 Fan Control.app`; remove the old `Macmini contoral.app` from Applications before installing the new bundle to avoid duplicate copies. Launch the new copy from Applications and choose **重新啟動控制服務** in Settings to load the updated helper. If macOS requests approval again, complete it in Login Items & Extensions.
 
 The helper accepts only this app's bundle identifier signed by the same Apple signing team. The app also validates the helper's signature. IPC exposes set-target, restore, ping, and heartbeat; it exposes no arbitrary key writes, shell commands, or filesystem paths.
 
 The service records owned fan IDs before changing hardware in `/var/run/local.macmini.contoral.control.json` (root-owned, mode 0600). It restores owned fans on connection loss, expired 12-second heartbeat lease, serious/critical system thermal state, graceful service termination, and recovery after a service restart. The lease clock includes sleep. The app requests automatic mode before sleep and normal quit. Recovery errors retain journal ownership and are retried. A different program's manual session is not silently taken over.
+
+While manually controlling fans, v1.0.3 independently samples them in the helper. Three seconds of continuous invalid fan readings or loss of a previously available CPU/GPU temperature family triggers automatic recovery, even if app heartbeats continue. Recovery revokes the lease before hardware writes and blocks a new session until recovery finishes. Fault-injection tests exercise this policy using simulated hardware; they are not physical failure tests.
 
 ## Compatibility and limits
 

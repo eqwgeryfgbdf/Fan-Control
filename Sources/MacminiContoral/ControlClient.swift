@@ -71,6 +71,7 @@ enum ServiceHealth: String {
         guard canRestart else { return }
         busy = true; message = nil; revision += 1
         disconnect()
+        health = .checking
         do {
             try await service.unregister()
             try await Task.sleep(for: .seconds(1))
