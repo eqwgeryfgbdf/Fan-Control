@@ -1,0 +1,275 @@
+{
+  "version": "1.0.3",
+  "build": "5",
+  "source_commit": "82ca557b84cf6ec471f968cc3ece813add0b6e90",
+  "date": "2026-10-26",
+  "timezone": "Asia/Taipei",
+  "host": {
+    "model": "Mac16,10",
+    "chip": "Apple M4",
+    "macos": "26.7.1",
+    "build": "25G241"
+  },
+  "installed_path": "/Users/server/Applications/風扇管理 Fan Control.app",
+  "installation_integrity": "7 files SHA-256 matched; deep signature and helper installation validation passed",
+  "helper_version_ui": "1.0.3（5）",
+  "helper_parent_bundle_version": "5",
+  "helper_pid": 54989,
+  "older_helper_update_prompt_observed": true,
+  "app_opened": true,
+  "expanded_panel_ui_verified": true,
+  "menu_bar_top_strip_visual": "awaiting-user-confirmation; tool captures app windows only",
+  "menu_bar_settings": {
+    "rpm": true,
+    "cpu": true,
+    "gpu": true,
+    "trend": true
+  },
+  "invalid_inputs": {
+    "999": "Apply disabled; Return did not change 1800 RPM target",
+    "abc": "Apply disabled",
+    "empty": "Apply disabled"
+  },
+  "phases": {
+    "after-install": {
+      "samples": 3,
+      "first_timestamp": "2026-10-25T18:32:55Z",
+      "last_timestamp": "2026-10-25T18:32:57Z",
+      "modes": [
+        0
+      ],
+      "targets": [
+        1000
+      ],
+      "rpm_all": [
+        1000,
+        1001
+      ],
+      "rpm_last_up_to_5_samples": [
+        1000,
+        1001
+      ],
+      "cpu_last": {
+        "average": 65.00197251637776,
+        "maximum": 67.39855194091797,
+        "sensorCount": 12
+      },
+      "gpu_last": {
+        "average": 58.79257774353027,
+        "maximum": 61.73749923706055,
+        "sensorCount": 8
+      },
+      "thermal_states": [
+        0
+      ],
+      "sha256": "dd8f7c9d764321318c0808effd0fabe9bc97139645a2c6edfdc068f1856176ac"
+    },
+    "after-invalid-input": {
+      "samples": 2,
+      "first_timestamp": "2026-10-25T18:36:54Z",
+      "last_timestamp": "2026-10-25T18:36:55Z",
+      "modes": [
+        1
+      ],
+      "targets": [
+        1800
+      ],
+      "rpm_all": [
+        1798,
+        1800
+      ],
+      "rpm_last_up_to_5_samples": [
+        1798,
+        1800
+      ],
+      "cpu_last": {
+        "average": 53.853946367899574,
+        "maximum": 56.04656219482422,
+        "sensorCount": 12
+      },
+      "gpu_last": {
+        "average": 46.937371253967285,
+        "maximum": 49.78401565551758,
+        "sensorCount": 8
+      },
+      "thermal_states": [
+        0
+      ],
+      "sha256": "3d50366e1fcf2e423e90eeb89297cd2c5dd4893d32d142ec72a00efe37871436"
+    },
+    "before-install": {
+      "samples": 2,
+      "first_timestamp": "2026-10-25T18:32:54Z",
+      "last_timestamp": "2026-10-25T18:32:55Z",
+      "modes": [
+        0
+      ],
+      "targets": [
+        1000
+      ],
+      "rpm_all": [
+        1000,
+        1001
+      ],
+      "rpm_last_up_to_5_samples": [
+        1000,
+        1001
+      ],
+      "cpu_last": {
+        "average": 69.2546780904134,
+        "maximum": 73.83116149902344,
+        "sensorCount": 12
+      },
+      "gpu_last": {
+        "average": 59.95113658905029,
+        "maximum": 62.90369415283203,
+        "sensorCount": 8
+      },
+      "thermal_states": [
+        0
+      ],
+      "sha256": "c109f31534370e10c492dff92d4431173aa2b09074464b744b9e6df4fc76b412"
+    },
+    "input-1800": {
+      "samples": 10,
+      "first_timestamp": "2026-10-25T18:36:23Z",
+      "last_timestamp": "2026-10-25T18:36:33Z",
+      "modes": [
+        1
+      ],
+      "targets": [
+        1800
+      ],
+      "rpm_all": [
+        1798,
+        1801
+      ],
+      "rpm_last_up_to_5_samples": [
+        1798,
+        1801
+      ],
+      "cpu_last": {
+        "average": 54.55576515197754,
+        "maximum": 56.541378021240234,
+        "sensorCount": 12
+      },
+      "gpu_last": {
+        "average": 47.804537773132324,
+        "maximum": 50.738800048828125,
+        "sensorCount": 8
+      },
+      "thermal_states": [
+        0
+      ],
+      "sha256": "e3c34c8ce1cf2869047bd8e7e9c18405a0b42f6340c554cb0c93ecfc835f1607"
+    },
+    "quick-1500": {
+      "samples": 10,
+      "first_timestamp": "2026-10-25T18:36:08Z",
+      "last_timestamp": "2026-10-25T18:36:18Z",
+      "modes": [
+        1
+      ],
+      "targets": [
+        1500
+      ],
+      "rpm_all": [
+        1498,
+        1501
+      ],
+      "rpm_last_up_to_5_samples": [
+        1498,
+        1501
+      ],
+      "cpu_last": {
+        "average": 55.14292621612549,
+        "maximum": 56.99699783325195,
+        "sensorCount": 12
+      },
+      "gpu_last": {
+        "average": 48.227325439453125,
+        "maximum": 51.197959899902344,
+        "sensorCount": 8
+      },
+      "thermal_states": [
+        0
+      ],
+      "sha256": "3685219f708b056069e5eaff85e1f2f47b49a898d94aab12f702604d5f002faa"
+    },
+    "quick-2000": {
+      "samples": 12,
+      "first_timestamp": "2026-10-25T18:35:51Z",
+      "last_timestamp": "2026-10-25T18:36:02Z",
+      "modes": [
+        1
+      ],
+      "targets": [
+        2000
+      ],
+      "rpm_all": [
+        1999,
+        2002
+      ],
+      "rpm_last_up_to_5_samples": [
+        1999,
+        2002
+      ],
+      "cpu_last": {
+        "average": 55.180739402770996,
+        "maximum": 56.86977005004883,
+        "sensorCount": 12
+      },
+      "gpu_last": {
+        "average": 48.51712226867676,
+        "maximum": 51.3955078125,
+        "sensorCount": 8
+      },
+      "thermal_states": [
+        0
+      ],
+      "sha256": "6add01e0c952e70dbd3ccca9b0758609bf8ba17f897abf2b98adce89c4f7f0fb"
+    },
+    "restored-automatic": {
+      "samples": 12,
+      "first_timestamp": "2026-10-25T18:37:06Z",
+      "last_timestamp": "2026-10-25T18:37:17Z",
+      "modes": [
+        0
+      ],
+      "targets": [
+        1000
+      ],
+      "rpm_all": [
+        999,
+        1002
+      ],
+      "rpm_last_up_to_5_samples": [
+        999,
+        1000
+      ],
+      "cpu_last": {
+        "average": 55.38192590077718,
+        "maximum": 57.98486328125,
+        "sensorCount": 12
+      },
+      "gpu_last": {
+        "average": 47.285054206848145,
+        "maximum": 50.094207763671875,
+        "sensorCount": 8
+      },
+      "thermal_states": [
+        0
+      ],
+      "sha256": "b35e6f616231d56c4f7de9a43eab44e2454c82347df305753cfa89f62f0f3d78"
+    }
+  },
+  "automatic_restored": true,
+  "source_fixes_required": false,
+  "github_pushed": false,
+  "limitations": [
+    "macOS 15, Intel and other hardware not physically tested",
+    "Sleep/wake and physical fault injection not tested",
+    "Apple Development signed; not notarized"
+  ],
+  "local_evidence_directory": "/Users/server/Project/MacminiContoral/dist/install-v1.0.3-validation"
+}

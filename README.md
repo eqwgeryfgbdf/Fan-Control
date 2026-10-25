@@ -4,7 +4,7 @@ Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected v
 
 原生 macOS 選單列風扇與溫度監測工具。可即時查看風扇轉速、CPU／GPU 感測器平均溫度及最近 15 分鐘趨勢，並在管理員授權後使用快速調速控制。支援 macOS 15 以上，macOS 26 以上適量採用 Liquid Glass。
 
-目前原始碼為 **v1.0.3（build 5）本地開發版**：加入感測器失效保護、控制服務連線與版本確認、選單列 RPM／CPU／GPU 個別顯示開關、常用轉速快捷鍵與整數轉速輸入。尚未發布或替換已安裝的 v1.0.2；驗證範圍見 [本地改善紀錄](docs/v1.0.3-local-improvements.md)。
+目前原始碼為 **v1.0.3（build 5）本地開發版**：加入感測器失效保護、控制服務連線與版本確認、選單列 RPM／CPU／GPU 個別顯示開關、常用轉速快捷鍵與整數轉速輸入。已安裝至本機，完成 M4 Mac mini 上的展開面板、快捷調速、數字輸入與恢復自動驗證；尚未發布 GitHub。驗證範圍見 [安裝實測紀錄](docs/v1.0.3-install-validation-2026-10-26.md) 與 [本地改善紀錄](docs/v1.0.3-local-improvements.md)。
 
 [繁體中文使用說明](docs/使用說明.md) · [實機驗證紀錄](docs/validation.md)
 
