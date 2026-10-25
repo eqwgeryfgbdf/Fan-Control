@@ -3,7 +3,7 @@
 - 官網：<https://fancontrol.emo-lab.com/>
 - 主站入口：EMO-Lab 首頁「繼續探索」、專案頁與頁尾。
 - 下載：所有下載按鈕直接連結 `https://github.com/eqwgeryfgbdf/Fan-Control/releases/latest`。
-- 官網目前介紹已發布的 v1.0.3。v1.0.4 原始碼中的並排主畫面尚未製作 Release，不把它當作目前安裝檔已有的功能。
+- 官網下載版本為 v1.0.4（build 7）：英文名稱 Fan Control 與多風扇並排主畫面。下載按鈕維持指向最新正式 Release。
 
 使用原創風扇 SVG Logo、系統字體、大字級標題、輕量捲動進場與按鈕過場。無追蹤碼、第三方字體、彈出提示或假下載按鈕。動畫遵循 `prefers-reduced-motion`；JavaScript 未執行時內容與連結仍完整可用。主視窗為標示清楚的介面示意；選單列面板使用 v1.0.3 的實際截圖。
 

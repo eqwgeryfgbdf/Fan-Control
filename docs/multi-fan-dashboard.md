@@ -22,3 +22,7 @@
 建置檔：`dist/風扇管理 Fan Control.app`。建置紀錄：`dist/build-v1.0.4.log`；測試紀錄：`dist/tests-v1.0.4.log`；本機版面證據：`dist/dashboard-validation/`。摘要見 [驗證結果](multi-fan-dashboard-validation.json)。
 
 已安裝 App 仍為 v1.0.3。此功能僅保存至本地 Git，未推送 GitHub、未建立 Release 或 DMG。
+
+## v1.0.4 發布更新
+
+本頁上方保留功能完成當時的驗證狀態。2026-10-26 已以英文名稱 Fan Control、build 7 完成打包發布；最新驗證與安裝說明見 [v1.0.4 Release 紀錄](release-v1.0.4.md)。本次發布未取代本機已安裝 App。

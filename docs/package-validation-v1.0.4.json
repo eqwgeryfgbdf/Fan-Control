@@ -1,0 +1,46 @@
+{
+  "version": "1.0.4",
+  "build": "7",
+  "display_name": "Fan Control",
+  "dmg": "Fan-Control-1.0.4-macos-universal.dmg",
+  "bytes": 3775385,
+  "sha256": "a966d8cbf08b88111bf34a5ffe13df582f97899658172c8fc91c3b27fcc5ad45",
+  "checksum_asset_sha256": "43659454cd9558c6ca285338b89352b9ef1fbe203c8e293beaa4587a3e3f1f8b",
+  "signature_verified": true,
+  "mounted_files_match_build": true,
+  "files_verified": 7,
+  "contents": [
+    "Applications",
+    "Fan Control.app",
+    "安裝說明.txt"
+  ],
+  "helper_installation_validation": "Validated helper bundle: /Volumes/Fan Control 1.0.4/Fan Control.app",
+  "binaries": {
+    "MacminiContoral": {
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "minimum_os": [
+        "15.0",
+        "15.0"
+      ],
+      "sha256": "ac135caad53b5f8bb5559130b2a93fcc4f9d629bdc89d9d66d70563b300e0e9e"
+    },
+    "MacminiHelper": {
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "minimum_os": [
+        "15.0",
+        "15.0"
+      ],
+      "sha256": "e8788e8171d4471506be8e5a2e4c9a0cf6ce04481476a1ad67e73a2eebd5db28"
+    }
+  },
+  "unit_tests_passed": 29,
+  "physical_multifan_control_tested": false,
+  "installed_during_release": false,
+  "notarized": false
+}
