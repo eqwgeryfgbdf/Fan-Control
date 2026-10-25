@@ -1,0 +1,12 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "emo-lab-container-entry",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-12",
+  "services": [{"binding": "EMOLAB_ORIGIN", "service": "emo-lab-website"}],
+  "workers_dev": true,
+  "routes": [
+    {"pattern": "emo-lab.com/", "zone_name": "emo-lab.com"},
+    {"pattern": "emo-lab.com/projects*", "zone_name": "emo-lab.com"}
+  ]
+}

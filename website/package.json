@@ -1,0 +1,15 @@
+{
+  "name": "fan-control-website",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8792",
+    "check": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy",
+    "check:entry": "node scripts/check-entry.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.151.1"
+  }
+}

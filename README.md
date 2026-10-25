@@ -1,4 +1,4 @@
-# 風扇管理 Fan Control
+# Fan Control
 
 Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected visual reference is `docs/selected-design.png`.
 
@@ -6,15 +6,15 @@ Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected v
 
 已發布 **v1.0.3（build 5）**：加入感測器失效保護、控制服務連線與版本確認、選單列 RPM／CPU／GPU 個別顯示開關、常用轉速快捷鍵與整數轉速輸入。已安裝至本機，完成 M4 Mac mini 上的展開面板、快捷調速、數字輸入與恢復自動驗證。驗證範圍見 [安裝實測紀錄](docs/v1.0.3-install-validation-2026-10-26.md) 與 [本地改善紀錄](docs/v1.0.3-local-improvements.md)。
 
-目前本地開發版為 **v1.0.4（build 6）**：主畫面直接並排顯示所有實際偵測到的風扇，每顆都有獨立 RPM、圖表、目標輸入與快捷調速；多顆時依視窗寬度換行，不需切換風扇。已完成 Universal 建置與模擬版面驗證，尚未安裝或發布；詳見 [多風扇主畫面](docs/multi-fan-dashboard.md)。
+目前開發版為 **v1.0.4（build 7）**：軟體名稱統一為 **Fan Control**，主畫面直接並排顯示所有實際偵測到的風扇，每顆都有獨立 RPM、圖表、目標輸入與快捷調速；多顆時依視窗寬度換行，不需切換風扇。已完成 Universal 建置與模擬版面驗證，尚未安裝或製作 Release；詳見 [多風扇主畫面](docs/multi-fan-dashboard.md)。
 
-[繁體中文使用說明](docs/使用說明.md) · [實機驗證紀錄](docs/validation.md)
+[Fan Control 官網](https://fancontrol.emo-lab.com/) · [繁體中文使用說明](docs/使用說明.md) · [實機驗證紀錄](docs/validation.md)
 
 ![主視窗實機截圖](docs/main-window.png)
 
 v1.0.1 包含風扇控制服務啟動及韌體回讀延遲修正，已於 2026-10-24 在 M4 Mac mini 驗證即時監測、1,500／2,000 RPM 手動調速、降速及恢復自動，見 [手動控制實機測試](docs/manual-control-validation-2026-10-24.md)。macOS 15、Intel 與其他機型尚未完成實機測試。
 
-從 [v1.0.3 Release](https://github.com/eqwgeryfgbdf/Fan-Control/releases/tag/v1.0.3) 下載 Universal DMG；私有倉庫需要登入具有存取權的 GitHub 帳號。
+從 [v1.0.3 Release](https://github.com/eqwgeryfgbdf/Fan-Control/releases/tag/v1.0.3) 下載 Universal DMG；公開下載，無須登入 GitHub。
 
 v1.0.2（build 4）正式更名為「風扇管理 Fan Control」，新增選單列迷你轉速走勢，以及展開面板內最近一分鐘的圖表。已完成選單列實機調速、降速、恢復自動與圖表更新驗證，詳見 [選單列與圖表驗證紀錄](docs/menu-bar-chart-validation-2026-10-24.md)。
 
@@ -36,12 +36,12 @@ Requires Xcode 26 or newer and a valid Apple Development or Developer ID signing
 ```sh
 ./scripts/build-app.sh
 ./scripts/package-dmg.sh
-open 'dist/風扇管理 Fan Control.app'
+open 'dist/Fan Control.app'
 ```
 
 The script builds arm64 and x86_64, combines both into universal app/helper executables, embeds the launch daemon, and signs the bundle. Override `SIGNING_IDENTITY` to select a different signing certificate. The minimum OS is encoded as 15.0 in both binary architectures and Info.plist.
 
-The default local development build is 1.0.4 (build 6); the published download remains v1.0.3. `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG. See [v1.0.3 release notes](docs/release-v1.0.3.md) for the packaged build and validation scope.
+The default local development build is 1.0.4 (build 7); the published download remains v1.0.3. `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG. See [v1.0.3 release notes](docs/release-v1.0.3.md) for the packaged build and validation scope.
 
 Install the app in `/Applications` or your `~/Applications` folder before enabling the control service. The local deliverable uses development signing; it is not a notarized public release.
 
@@ -53,7 +53,7 @@ After approval, choose Manual, select a target within the firmware-reported rang
 
 In v1.0.3, authorization alone does not enable writes. The app verifies the running helper's protocol, version and build first. An older helper shows an update prompt and monitoring remains available. Recovery status stays pending until the helper confirms restoration; the UI also displays the hardware's actual mode separately from the target editor.
 
-When upgrading, restore automatic control and quit the old app before replacing it. Version 1.0.2 renames the app bundle to `風扇管理 Fan Control.app`; remove the old `Macmini contoral.app` from Applications before installing the new bundle to avoid duplicate copies. Launch the new copy from Applications and choose **重新啟動控制服務** in Settings to load the updated helper. If macOS requests approval again, complete it in Login Items & Extensions.
+When upgrading, restore automatic control and quit the old app before replacing it. The development build now uses `Fan Control.app` and the display name **Fan Control**. After installing this build, remove old `風扇管理 Fan Control.app` or `Macmini contoral.app` copies to avoid duplicates. The published v1.0.3 DMG retains its original bundle name. Launch the new copy from Applications and choose **重新啟動控制服務** in Settings to load the updated helper. If macOS requests approval again, complete it in Login Items & Extensions.
 
 The helper accepts only this app's bundle identifier signed by the same Apple signing team. The app also validates the helper's signature. IPC exposes set-target, restore, ping, and heartbeat; it exposes no arbitrary key writes, shell commands, or filesystem paths.
 

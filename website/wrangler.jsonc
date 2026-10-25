@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "fan-control-site",
+  "account_id": "eb4b6fdd55ad9cde1c6afc7e3197dd53",
+  "compatibility_date": "2026-10-25",
+  "assets": { "directory": "./public", "not_found_handling": "404-page" },
+  "routes": [{ "pattern": "fancontrol.emo-lab.com", "custom_domain": true }],
+  "workers_dev": true,
+  "preview_urls": false
+}

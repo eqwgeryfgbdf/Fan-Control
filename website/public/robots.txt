@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fancontrol.emo-lab.com/sitemap.xml

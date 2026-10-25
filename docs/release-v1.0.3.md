@@ -1,4 +1,4 @@
-# 風扇管理 Fan Control v1.0.3
+# Fan Control v1.0.3
 
 日期：2026-10-26（Asia/Taipei）。App 版本 1.0.3，build 5。Universal 支援 Apple Silicon 與 Intel，最低 macOS 15。
 
@@ -21,7 +21,7 @@
 
 ## 下載與更新
 
-[v1.0.3 Release](https://github.com/eqwgeryfgbdf/Fan-Control/releases/tag/v1.0.3)。原 MacminiContoral 倉庫目前已更名為 `eqwgeryfgbdf/Fan-Control`，仍為私有倉庫；需使用有權限的 GitHub 帳號下載。
+[v1.0.3 Release](https://github.com/eqwgeryfgbdf/Fan-Control/releases/tag/v1.0.3)。原 MacminiContoral 倉庫目前已更名為 `eqwgeryfgbdf/Fan-Control`，現已公開，可直接下載，無須登入 GitHub。
 
 1. 舊版先恢復自動調節並結束 App。
 2. 開啟 DMG，將「風扇管理 Fan Control.app」拖至 Applications，取代舊版。

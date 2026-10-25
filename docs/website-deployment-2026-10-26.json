@@ -1,0 +1,37 @@
+{
+  "site": "https://fancontrol.emo-lab.com/",
+  "site_worker_version": "9dd7677a-ecd5-4281-bed5-6b8fcc70abb0",
+  "entry_worker_version": "55b7513a-ca82-4a68-a140-4d924f147f3a",
+  "previous_entry_worker_version": "7b02e395-4a98-4f26-b6ff-bb4e2c0fbf3d",
+  "assets": [
+    {
+      "asset": "index.html",
+      "sha256": "830c931f2fd6ae1cb8a00ddb0ddb4a94d8d2c959a680e0c4e151e4dc31b20217"
+    },
+    {
+      "asset": "styles.css",
+      "sha256": "cc14e6fdc448e946623c4ca9382848e692038783573a1fa074f39d54e3039d52"
+    },
+    {
+      "asset": "main.js",
+      "sha256": "bc7ec3796d0e7ae726cc5b269337f86d6c85eebeffc0d51223baea3b82d6688e"
+    },
+    {
+      "asset": "logo.svg",
+      "sha256": "9f1f2b38d44edeab0ce6d420f15758557a9da54399938a3e251e41eb7980c610"
+    },
+    {
+      "asset": "panel.png",
+      "sha256": "2c49fa6282bcb8347cf3aa4c8b672318f5d29f53687913547210e7ef1442e93c"
+    }
+  ],
+  "download": {
+    "repository": "https://github.com/eqwgeryfgbdf/Fan-Control",
+    "visibility": "public",
+    "anonymous_download_verified": true,
+    "release": "https://github.com/eqwgeryfgbdf/Fan-Control/releases/tag/v1.0.3",
+    "asset_url": "https://github.com/eqwgeryfgbdf/Fan-Control/releases/download/v1.0.3/Fan-Control-1.0.3-macos-universal.dmg",
+    "bytes": 2968417,
+    "sha256": "dd7147ce04569f8ae489e96acb6cb20ed52230f61ed802389f4df63883ca39f1"
+  }
+}
