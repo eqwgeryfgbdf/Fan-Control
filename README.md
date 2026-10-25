@@ -4,7 +4,7 @@ Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected v
 
 原生 macOS 選單列風扇與溫度監測工具。可即時查看風扇轉速、CPU／GPU 感測器平均溫度及最近 15 分鐘趨勢，並在管理員授權後使用快速調速控制。支援 macOS 15 以上，macOS 26 以上適量採用 Liquid Glass。
 
-目前原始碼為 **v1.0.3（build 5）本地開發版**：加入感測器失效保護、控制服務連線與版本確認、選單列 RPM／CPU／GPU 個別顯示開關、常用轉速快捷鍵與整數轉速輸入。已安裝至本機，完成 M4 Mac mini 上的展開面板、快捷調速、數字輸入與恢復自動驗證；尚未發布 GitHub。驗證範圍見 [安裝實測紀錄](docs/v1.0.3-install-validation-2026-10-26.md) 與 [本地改善紀錄](docs/v1.0.3-local-improvements.md)。
+目前原始碼為 **v1.0.3（build 5）**：加入感測器失效保護、控制服務連線與版本確認、選單列 RPM／CPU／GPU 個別顯示開關、常用轉速快捷鍵與整數轉速輸入。已安裝至本機，完成 M4 Mac mini 上的展開面板、快捷調速、數字輸入與恢復自動驗證。驗證範圍見 [安裝實測紀錄](docs/v1.0.3-install-validation-2026-10-26.md) 與 [本地改善紀錄](docs/v1.0.3-local-improvements.md)。
 
 [繁體中文使用說明](docs/使用說明.md) · [實機驗證紀錄](docs/validation.md)
 
@@ -12,7 +12,7 @@ Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected v
 
 v1.0.1 包含風扇控制服務啟動及韌體回讀延遲修正，已於 2026-10-24 在 M4 Mac mini 驗證即時監測、1,500／2,000 RPM 手動調速、降速及恢復自動，見 [手動控制實機測試](docs/manual-control-validation-2026-10-24.md)。macOS 15、Intel 與其他機型尚未完成實機測試。
 
-從 [v1.0.2 Release](https://github.com/eqwgeryfgbdf/MacminiContoral/releases/tag/v1.0.2) 下載 Universal DMG；私有倉庫需要登入具有存取權的 GitHub 帳號。
+從 [v1.0.3 Release](https://github.com/eqwgeryfgbdf/Fan-Control/releases/tag/v1.0.3) 下載 Universal DMG；私有倉庫需要登入具有存取權的 GitHub 帳號。
 
 v1.0.2（build 4）正式更名為「風扇管理 Fan Control」，新增選單列迷你轉速走勢，以及展開面板內最近一分鐘的圖表。已完成選單列實機調速、降速、恢復自動與圖表更新驗證，詳見 [選單列與圖表驗證紀錄](docs/menu-bar-chart-validation-2026-10-24.md)。
 
@@ -39,7 +39,7 @@ open 'dist/風扇管理 Fan Control.app'
 
 The script builds arm64 and x86_64, combines both into universal app/helper executables, embeds the launch daemon, and signs the bundle. Override `SIGNING_IDENTITY` to select a different signing certificate. The minimum OS is encoded as 15.0 in both binary architectures and Info.plist.
 
-The default local development version is 1.0.3 (build 5). `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG. The currently published download remains v1.0.2 until an explicit release is requested.
+The default build version is 1.0.3 (build 5). `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG. See [v1.0.3 release notes](docs/release-v1.0.3.md) for the packaged build and validation scope.
 
 Install the app in `/Applications` or your `~/Applications` folder before enabling the control service. The local deliverable uses development signing; it is not a notarized public release.
 
