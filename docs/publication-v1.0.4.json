@@ -1,0 +1,28 @@
+{
+  "release": "https://github.com/eqwgeryfgbdf/Fan-Control/releases/tag/v1.0.4",
+  "tag": "v1.0.4",
+  "commit": "c2fa8d23f512f773251f5bad4935b1724ef7692c",
+  "anonymous_download_verified": true,
+  "assets": [
+    {
+      "name": "Fan-Control-1.0.4-macos-universal.dmg",
+      "url": "https://github.com/eqwgeryfgbdf/Fan-Control/releases/download/v1.0.4/Fan-Control-1.0.4-macos-universal.dmg",
+      "bytes": 3775385,
+      "sha256": "a966d8cbf08b88111bf34a5ffe13df582f97899658172c8fc91c3b27fcc5ad45"
+    },
+    {
+      "name": "Fan-Control-1.0.4-macos-universal.dmg.sha256",
+      "url": "https://github.com/eqwgeryfgbdf/Fan-Control/releases/download/v1.0.4/Fan-Control-1.0.4-macos-universal.dmg.sha256",
+      "bytes": 104,
+      "sha256": "43659454cd9558c6ca285338b89352b9ef1fbe203c8e293beaa4587a3e3f1f8b"
+    }
+  ],
+  "verified_date": "2026-10-26",
+  "timezone": "Asia/Taipei",
+  "website": "https://fancontrol.emo-lab.com/",
+  "website_worker_version": "f2c39aa0-dc21-4106-8702-23ced579664e",
+  "website_index_sha256": "43b54ca1b612347cbbc0bc8d7e86fdba11a27aa379dfcae63dc962e3ff5537f0",
+  "website_matches_local": true,
+  "browser_download_button_resolves_to_release": true,
+  "website_screenshot": "website-v1.0.4-download.png"
+}
