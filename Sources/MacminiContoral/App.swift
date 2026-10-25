@@ -27,7 +27,7 @@ import AppKit
         return parts.joined(separator: " · ")
     }
     var body: some Scene {
-        Window("風扇管理 Fan Control", id: "monitor") {
+        Window("Fan Control", id: "monitor") {
             MonitorView(model: model, control: model.control)
                 .task { model.start() }
         }
@@ -49,7 +49,7 @@ import AppKit
                     Image(nsImage: MenuBarTrendIcon.image(for: model.menuTrend))
                 } else { Image(systemName: "fanblades") }
             }
-                .accessibilityLabel("風扇管理 Fan Control，即時風扇與溫度監測")
+                .accessibilityLabel("Fan Control，即時風扇與溫度監測")
                 .accessibilityValue("\(Format.rpm(model.usableFan?.rpm)) RPM，CPU \(Format.temperature(model.isStale ? nil : model.snapshot?.cpu.average))，GPU \(Format.temperature(model.isStale ? nil : model.snapshot?.gpu.average))")
         }
         .menuBarExtraStyle(.window)

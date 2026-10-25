@@ -62,7 +62,7 @@ enum ServiceHealth: String {
         } catch { message = "無法啟用控制服務：\(error.localizedDescription)" }
         busy = false; refreshStatus()
         if requiresApproval {
-            message = "請在系統設定的登入項目中允許 風扇管理 Fan Control。"
+            message = "請在系統設定的登入項目中允許 Fan Control。"
             SMAppService.openSystemSettingsLoginItems()
         }
     }

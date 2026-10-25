@@ -105,7 +105,7 @@ import FanCore
     }
     func showMainWindow() {
         NSApp.activate(ignoringOtherApps: true)
-        if let window = NSApp.windows.first(where: { $0.identifier?.rawValue == "monitor" || $0.title == "風扇管理 Fan Control" }) {
+        if let window = NSApp.windows.first(where: { $0.identifier?.rawValue == "monitor" || $0.title == "Fan Control" }) {
             window.makeKeyAndOrderFront(nil)
         }
     }
