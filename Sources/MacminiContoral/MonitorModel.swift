@@ -24,9 +24,9 @@ import FanCore
     var isStale: Bool { snapshot.map { now.timeIntervalSince($0.timestamp) > 3 } ?? true }
     var usableFan: FanReading? { !isStale ? fan : nil }
     var menuTrend: FanTrend { FanTrend(history: menuHistory, fanID: selectedFan, end: now) }
-    var visibleHistory: [HistoryPoint] {
-        let end = historyPaused ? (history.last?.time ?? now) : now
-        return history.filter { $0.fanID == selectedFan && $0.time >= end.addingTimeInterval(-Double(minutes * 60)) }
+    var historyEnd: Date { historyPaused ? (history.last?.time ?? now) : now }
+    func visibleHistory(for fanID: Int) -> [HistoryPoint] {
+        history.filter { $0.fanID == fanID && $0.time >= historyEnd.addingTimeInterval(-Double(minutes * 60)) }
     }
     var deviceName: String { snapshot?.model.hasPrefix("Mac") == true ? "\(snapshot?.model ?? "Mac") · \(snapshot?.chip ?? "")" : "Mac" }
     func start() {
@@ -75,6 +75,22 @@ import FanCore
         catch { control.message = error.localizedDescription; return }
         targetRPM = requestedRPM
         await control.apply(fan: fan.id, rpm: targetRPM.rounded())
+    }
+    // Cards address their own hardware ID; the menu bar selection is independent.
+    func apply(fanID: Int, rpm: Double) async {
+        guard control.canApply else { control.message = "控制服務尚未就緒，請先確認服務狀態。"; return }
+        guard !isStale, let fan = snapshot?.fans.first(where: { $0.id == fanID }) else {
+            control.message = "這顆風扇的讀值尚未更新，暫時無法調速。"; return
+        }
+        guard (snapshot?.thermalState ?? 2) < 2 else {
+            control.message = "系統溫度偏高，暫時無法手動調速。"; return
+        }
+        do { try ControlPolicy.validate(rpm: rpm, fan: fan) }
+        catch { control.message = error.localizedDescription; return }
+        await control.apply(fan: fanID, rpm: rpm.rounded())
+    }
+    func restoreAllFans() async {
+        if await control.restore() { manualSelection = false }
     }
     func automatic() async {
         if let fan, !fan.isAutomatic, !control.canRestore {

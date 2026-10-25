@@ -4,7 +4,9 @@ Native SwiftUI fan and temperature monitor for macOS 15 or newer. The selected v
 
 原生 macOS 選單列風扇與溫度監測工具。可即時查看風扇轉速、CPU／GPU 感測器平均溫度及最近 15 分鐘趨勢，並在管理員授權後使用快速調速控制。支援 macOS 15 以上，macOS 26 以上適量採用 Liquid Glass。
 
-目前原始碼為 **v1.0.3（build 5）**：加入感測器失效保護、控制服務連線與版本確認、選單列 RPM／CPU／GPU 個別顯示開關、常用轉速快捷鍵與整數轉速輸入。已安裝至本機，完成 M4 Mac mini 上的展開面板、快捷調速、數字輸入與恢復自動驗證。驗證範圍見 [安裝實測紀錄](docs/v1.0.3-install-validation-2026-10-26.md) 與 [本地改善紀錄](docs/v1.0.3-local-improvements.md)。
+已發布 **v1.0.3（build 5）**：加入感測器失效保護、控制服務連線與版本確認、選單列 RPM／CPU／GPU 個別顯示開關、常用轉速快捷鍵與整數轉速輸入。已安裝至本機，完成 M4 Mac mini 上的展開面板、快捷調速、數字輸入與恢復自動驗證。驗證範圍見 [安裝實測紀錄](docs/v1.0.3-install-validation-2026-10-26.md) 與 [本地改善紀錄](docs/v1.0.3-local-improvements.md)。
+
+目前本地開發版為 **v1.0.4（build 6）**：主畫面直接並排顯示所有實際偵測到的風扇，每顆都有獨立 RPM、圖表、目標輸入與快捷調速；多顆時依視窗寬度換行，不需切換風扇。已完成 Universal 建置與模擬版面驗證，尚未安裝或發布；詳見 [多風扇主畫面](docs/multi-fan-dashboard.md)。
 
 [繁體中文使用說明](docs/使用說明.md) · [實機驗證紀錄](docs/validation.md)
 
@@ -20,7 +22,7 @@ v1.0.2（build 4）正式更名為「風扇管理 Fan Control」，新增選單�
 
 ## Features
 
-- A chart-focused main window with 1, 5, and 15 minute history, per-fan actual RPM, firmware limits, and current mode.
+- A main dashboard with every detected fan displayed in parallel cards: independent actual RPM, 1/5/15-minute history, firmware limits, mode and target controls. Cards wrap with window width; a single fan fills the available width. Restore All Automatic stays in the toolbar.
 - A persistent menu bar item with individually configurable RPM, CPU and GPU temperatures, and an optional monochrome one-minute sparkline. The panel includes a one-minute RPM chart, validated integer input, hardware-filtered 1,500/2,000/2,500 RPM quick actions, Apply, and Restore Automatic.
 - Menu bar trends keep updating when the main chart is paused. Missing readings remain gaps; the chart shows real samples only, with a minimum 200 RPM vertical span to avoid amplifying minor sensor noise. The mini sparkline can be turned off in Settings.
 - Real readings sampled once per second off the main thread. Pausing the chart does not pause sensor readings or control heartbeats. History stays in memory and is not uploaded.
@@ -39,7 +41,7 @@ open 'dist/風扇管理 Fan Control.app'
 
 The script builds arm64 and x86_64, combines both into universal app/helper executables, embeds the launch daemon, and signs the bundle. Override `SIGNING_IDENTITY` to select a different signing certificate. The minimum OS is encoded as 15.0 in both binary architectures and Info.plist.
 
-The default build version is 1.0.3 (build 5). `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG. See [v1.0.3 release notes](docs/release-v1.0.3.md) for the packaged build and validation scope.
+The default local development build is 1.0.4 (build 6); the published download remains v1.0.3. `APP_VERSION` and `BUILD_NUMBER` can override these defaults. The packaging script reads that bundle version, creates a DMG with an Applications shortcut and installation notes, verifies the image, and writes its SHA-256 file. It refuses to replace an existing DMG. See [v1.0.3 release notes](docs/release-v1.0.3.md) for the packaged build and validation scope.
 
 Install the app in `/Applications` or your `~/Applications` folder before enabling the control service. The local deliverable uses development signing; it is not a notarized public release.
 

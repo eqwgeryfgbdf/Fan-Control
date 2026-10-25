@@ -2,8 +2,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 BUILD_MODE="${BUILD_MODE:-release}"
-APP_VERSION="${APP_VERSION:-1.0.3}"
-BUILD_NUMBER="${BUILD_NUMBER:-5}"
+APP_VERSION="${APP_VERSION:-1.0.4}"
+BUILD_NUMBER="${BUILD_NUMBER:-6}"
 if [[ ! "$APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ || ! "$BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
   echo 'Invalid application version or build number.' >&2
   exit 1

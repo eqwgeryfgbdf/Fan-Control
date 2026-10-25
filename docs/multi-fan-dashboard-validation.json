@@ -1,0 +1,52 @@
+{
+  "version": "1.0.4",
+  "build": "6",
+  "status": "local development; not installed or released",
+  "installed_version": "1.0.3",
+  "tests_passed": 29,
+  "universal_build": true,
+  "signature_verified": true,
+  "binaries": {
+    "MacminiContoral": {
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "sha256": "e4dc16c59733f502bf5ad0e43b86e73debe8303e6633044ad34d4818b2545298"
+    },
+    "MacminiHelper": {
+      "architectures": [
+        "x86_64",
+        "arm64"
+      ],
+      "sha256": "fc1d10d896e1902eb44e4c9bb024c174c2b683b52c2dab12727a8ebff44afff4"
+    }
+  },
+  "ui_fixture_counts": [
+    0,
+    1,
+    2,
+    4
+  ],
+  "ui_fixture_fan_ids": [
+    0,
+    1,
+    3,
+    5
+  ],
+  "independent_inputs": {
+    "fan_0": 1600,
+    "fan_1": 2200,
+    "preserved_after_scroll": true
+  },
+  "history_isolated_from_menu_selection": true,
+  "preview_widths_observed": [
+    1050,
+    824
+  ],
+  "actual_hardware_fan_count": 1,
+  "actual_mode_at_readonly_check": 0,
+  "physical_multifan_control_tested": false,
+  "github_pushed": false,
+  "evidence_directory": "dist/dashboard-validation"
+}

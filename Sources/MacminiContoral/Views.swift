@@ -19,62 +19,76 @@ private struct AdaptiveControls: ViewModifier {
 struct MonitorView: View {
     @ObservedObject var model: MonitorModel
     @ObservedObject var control: ControlClient
-    @State private var showControl = false
+    private var columns: [GridItem] {
+        (model.snapshot?.fans.count ?? 0) <= 1
+            ? [GridItem(.flexible(), alignment: .top)]
+            : [GridItem(.adaptive(minimum: 340), spacing: 20, alignment: .top)]
+    }
     var body: some View {
-        VStack(alignment: .leading, spacing: 26) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("風扇轉速").font(.system(size: 30, weight: .semibold))
-                    Text(deviceTitle).foregroundStyle(.secondary)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("風扇轉速").font(.system(size: 30, weight: .semibold))
+                        Text(deviceTitle).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 8) {
+                        Text("\(model.snapshot?.fans.count ?? 0) 顆風扇").font(.title3.weight(.medium))
+                        Label(model.isStale ? "等待感測器" : "每秒更新", systemImage: model.isStale ? "clock" : "circle.fill")
+                            .font(.caption).foregroundStyle(model.isStale ? Color.secondary : Color.accentColor)
+                    }
                 }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 6) {
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text(Format.rpm(model.usableFan?.rpm)).font(.system(size: 36, weight: .semibold, design: .rounded))
-                        Text("RPM").font(.title3).foregroundStyle(.secondary)
-                    }.monospacedDigit()
-                    Label(model.isStale ? "等待感測器" : "每秒更新", systemImage: model.isStale ? "clock" : "circle.fill")
-                        .font(.caption).foregroundStyle(model.isStale ? Color.secondary : Color.accentColor)
+                HStack(spacing: 20) {
+                    Picker("顯示範圍", selection: $model.minutes) {
+                        Text("1 分鐘").tag(1); Text("5 分鐘").tag(5); Text("15 分鐘").tag(15)
+                    }.pickerStyle(.segmented).frame(width: 280)
+                    Spacer()
+                    Label("CPU \(Format.temperature(model.isStale ? nil : model.snapshot?.cpu.average))", systemImage: "thermometer.medium")
+                    Label("GPU \(Format.temperature(model.isStale ? nil : model.snapshot?.gpu.average))", systemImage: "cpu")
+                }.font(.callout).monospacedDigit()
+                if let error = model.snapshot?.error {
+                    Label(error, systemImage: "exclamationmark.triangle").font(.callout).foregroundStyle(.orange)
                 }
-            }
-            HStack(spacing: 20) {
-                Picker("顯示範圍", selection: $model.minutes) {
-                    Text("1 分鐘").tag(1); Text("5 分鐘").tag(5); Text("15 分鐘").tag(15)
-                }.pickerStyle(.segmented).frame(width: 300)
-                if (model.snapshot?.fans.count ?? 0) > 1 {
-                    Picker("風扇", selection: $model.selectedFan) {
-                        ForEach(model.snapshot?.fans ?? []) { Text($0.name).tag($0.id) }
-                    }.frame(width: 160)
+                if let fans = model.snapshot?.fans, !fans.isEmpty {
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 20) {
+                        ForEach(fans.sorted { $0.id < $1.id }) { fan in
+                            FanDashboardCard(model: model, control: control, fan: fan)
+                        }
+                    }
+                } else {
+                    ContentUnavailableView("尚未偵測到風扇", systemImage: "fanblades", description: Text("取得硬體資料後，這台 Mac 的所有風扇會直接顯示在這裡。"))
+                        .frame(minHeight: 300)
                 }
-                Spacer()
-                Label("CPU \(Format.temperature(model.isStale ? nil : model.snapshot?.cpu.average))", systemImage: "thermometer.medium")
-                Label("GPU \(Format.temperature(model.isStale ? nil : model.snapshot?.gpu.average))", systemImage: "cpu")
-            }.font(.callout).monospacedDigit()
-            if let error = model.snapshot?.error {
-                Label(error, systemImage: "exclamationmark.triangle").font(.callout).foregroundStyle(.orange)
-            }
-            chart.frame(minHeight: 220, maxHeight: .infinity)
-            Divider()
-            fanTable
-            Divider()
-            HStack {
-                Text("\(model.snapshot?.fans.count ?? 0) 顆風扇")
-                if model.historyPaused { Label("圖表已暫停，感測器仍持續更新", systemImage: "pause.circle") }
-                Spacer()
-                Text(model.snapshot?.timestamp ?? Date(), style: .time)
-                Text("· macOS 15+")
-            }.font(.caption).foregroundStyle(.secondary)
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Label(control.health.rawValue, systemImage: control.health == .ready ? "checkmark.circle" : "info.circle")
+                        if let message = control.message { Text(message).fixedSize(horizontal: false, vertical: true) }
+                    }.font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    SettingsLink { Label("控制設定", systemImage: "gearshape") }
+                }
+                Divider()
+                HStack {
+                    if model.historyPaused { Label("圖表已暫停，感測器仍持續更新", systemImage: "pause.circle") }
+                    Spacer()
+                    Text(model.snapshot?.timestamp ?? model.now, style: .time)
+                    Text("· macOS 15+")
+                }.font(.caption).foregroundStyle(.secondary)
+            }.padding(30)
         }
-        .padding(30)
         .background(Color(nsColor: .textBackgroundColor))
         .frame(minWidth: 820, minHeight: 600)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                // Remains accessible even when many cards require scrolling.
+                Button("全部恢復自動", systemImage: "arrow.counterclockwise") {
+                    Task { await model.restoreAllFans() }
+                }.disabled(!control.canRestore || control.busy)
+                    .help("將此 App 控制的所有風扇交回 macOS 自動調節")
                 Button { model.historyPaused.toggle() } label: {
                     Label(model.historyPaused ? "繼續圖表" : "暫停圖表", systemImage: model.historyPaused ? "play" : "pause")
                 }.help("暫停圖表記錄；即時監測與風扇控制仍持續運作")
-                Button { showControl.toggle() } label: { Label("風扇控制", systemImage: "fanblades") }
-                    .popover(isPresented: $showControl, arrowEdge: .bottom) { MenuPanel(model: model, control: control) }
                 SettingsLink { Label("設定", systemImage: "gearshape") }
             }
         }
@@ -84,59 +98,123 @@ struct MonitorView: View {
         let name = s.model == "Mac16,10" || s.model == "Mac16,11" ? "Mac mini" : s.model
         return "\(name) · \(s.chip)"
     }
+}
+
+private struct FanDashboardCard: View {
+    @ObservedObject var model: MonitorModel
+    @ObservedObject var control: ControlClient
+    let fan: FanReading
+    @State private var rpmInput: String
+    init(model: MonitorModel, control: ControlClient, fan: FanReading) {
+        self.model = model; self.control = control; self.fan = fan
+        let initialRPM = [fan.target, fan.minimum].compactMap { $0 }.first {
+            (try? ControlPolicy.validate(rpm: $0, fan: fan)) != nil
+        }
+        _rpmInput = State(initialValue: initialRPM.map { String(Int($0)) } ?? "")
+    }
+    private var enteredRPM: Double? { FanQuickControl.parse(rpmInput, for: fan) }
+    private var canApply: Bool { control.canApply && !model.isStale && (model.snapshot?.thermalState ?? 2) < 2 }
+    private var modeText: String {
+        if control.recoveryPending && control.ownedFans.contains(fan.id) { return "正在恢復自動" }
+        if model.isStale || fan.mode == nil { return "等待硬體狀態" }
+        return fan.isAutomatic ? "macOS 自動" : "手動調節"
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack {
+                Label(fan.name, systemImage: "fanblades").font(.headline)
+                Spacer()
+                Text(modeText).font(.caption).foregroundStyle(.secondary)
+            }
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(Format.rpm(model.isStale ? nil : fan.rpm)).font(.system(size: 34, weight: .semibold, design: .rounded))
+                Text("RPM").foregroundStyle(.secondary)
+                Spacer()
+            }.monospacedDigit().accessibilityElement(children: .combine)
+            chart.frame(height: 210)
+            HStack {
+                Text("下限 \(Format.rpm(fan.minimum))")
+                Spacer()
+                Text("上限 \(Format.rpm(fan.maximum)) RPM")
+            }.font(.caption).foregroundStyle(.secondary).monospacedDigit()
+            controls
+        }
+        .padding(20)
+        .background(Color(nsColor: .controlBackgroundColor).opacity(0.45), in: RoundedRectangle(cornerRadius: 18))
+        .overlay { RoundedRectangle(cornerRadius: 18).strokeBorder(.primary.opacity(0.07)) }
+    }
+    private var controls: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if fan.controllable {
+                HStack {
+                    Text("目標轉速").font(.caption).foregroundStyle(.secondary)
+                    Spacer(minLength: 4)
+                    TextField("目標 RPM", text: $rpmInput)
+                        .textFieldStyle(.roundedBorder).multilineTextAlignment(.trailing).frame(width: 76)
+                        .accessibilityLabel("\(fan.name)目標轉速，RPM")
+                        .onSubmit { if canApply, let rpm = enteredRPM { apply(rpm) } }
+                    Text("RPM").font(.caption).foregroundStyle(.secondary)
+                    Button("套用") { if let rpm = enteredRPM { apply(rpm) } }
+                        .buttonStyle(.borderedProminent).disabled(!canApply || enteredRPM == nil)
+                        .accessibilityLabel("套用\(fan.name)轉速")
+                }
+                HStack(spacing: 8) {
+                    Text("快捷").font(.caption).foregroundStyle(.secondary)
+                    ForEach(FanQuickControl.presets(for: fan), id: \.self) { rpm in
+                        Button("\(Int(rpm))") { rpmInput = String(Int(rpm)); apply(rpm) }
+                            .controlSize(.small).disabled(!canApply)
+                            .accessibilityLabel("\(fan.name)快速套用 \(Int(rpm)) RPM")
+                    }
+                }
+                if enteredRPM == nil {
+                    Text("請輸入 \(Format.rpm(fan.minimum))–\(Format.rpm(fan.maximum)) 的整數轉速。")
+                        .font(.caption).foregroundStyle(.orange)
+                } else {
+                    Text("硬體目標 \(Format.rpm(model.isStale ? nil : fan.target)) RPM")
+                        .font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                }
+            } else {
+                Text("尚未取得有效的硬體範圍，暫時無法調速。")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+        }.padding(12).modifier(AdaptiveControls())
+    }
+    private func apply(_ rpm: Double) {
+        Task { await model.apply(fanID: fan.id, rpm: rpm) }
+    }
     private var chart: some View {
-        let points = model.visibleHistory
+        let points = model.visibleHistory(for: fan.id)
         let values = points.compactMap(\.rpm)
         let low = values.min() ?? 1000
         let high = values.max() ?? 1000
-        let padding = max(20, (high-low) * 0.15)
-        let end = model.historyPaused ? (points.last?.time ?? model.now) : model.now
-        return VStack(alignment: .leading, spacing: 12) {
-            Text("RPM").font(.caption).foregroundStyle(.secondary)
-            Chart {
-                // Break the line on missing readings and after a paused interval.
-                ForEach(chartSegments(points)) { segment in
-                    ForEach(segment.points) { point in
-                        if let rpm = point.rpm {
-                            LineMark(x: .value("時間", point.time), y: .value("轉速", rpm), series: .value("連續資料", segment.id))
-                                .foregroundStyle(Color.accentColor).lineStyle(StrokeStyle(lineWidth: 2))
-                        }
+        let padding = max(100, (high-low) * 0.15)
+        let end = model.historyEnd
+        return Chart {
+            ForEach(chartSegments(points)) { segment in
+                ForEach(segment.points) { point in
+                    if let rpm = point.rpm {
+                        LineMark(x: .value("時間", point.time), y: .value("轉速", rpm), series: .value("連續資料", segment.id))
+                            .foregroundStyle(Color.accentColor).lineStyle(StrokeStyle(lineWidth: 2))
                     }
                 }
             }
-            .chartYScale(domain: max(0, low-padding)...(high+padding))
-            .chartXScale(domain: end.addingTimeInterval(-Double(model.minutes*60))...end)
-            .chartYAxis { AxisMarks(position: .leading, values: .automatic(desiredCount: 5)) { _ in AxisGridLine(); AxisValueLabel() } }
-            .chartXAxis { AxisMarks(values: .automatic(desiredCount: 6)) { value in
-                AxisGridLine()
-                AxisValueLabel {
-                    if let date = value.as(Date.self) {
-                        let seconds = max(0, Int(end.timeIntervalSince(date)))
-                        Text(seconds < 10 ? "現在" : (model.minutes == 1 ? "−\(seconds) 秒" : "−\(Int((Double(seconds)/60).rounded())) 分鐘"))
-                    }
-                }
-            } }
-            .overlay { if values.isEmpty { ContentUnavailableView("等待風扇資料", systemImage: "fanblades", description: Text("取得轉速後，趨勢會自動顯示。")) } }
-            .accessibilityLabel("最近 \(model.minutes) 分鐘的風扇轉速")
         }
-    }
-    private var fanTable: some View {
-        Grid(alignment: .leading, horizontalSpacing: 24, verticalSpacing: 18) {
-            GridRow {
-                tableCell("風扇"); tableCell("目前轉速"); tableCell("硬體下限"); tableCell("硬體上限"); tableCell("模式")
-            }.font(.caption).foregroundStyle(.secondary)
-            ForEach(model.snapshot?.fans ?? []) { fan in
-                GridRow {
-                    Label(fan.name, systemImage: "fanblades").frame(maxWidth: .infinity, alignment: .leading)
-                    tableCell("\(Format.rpm(model.isStale ? nil : fan.rpm)) RPM")
-                    tableCell("\(Format.rpm(fan.minimum)) RPM")
-                    tableCell("\(Format.rpm(fan.maximum)) RPM")
-                    tableCell(fan.mode == nil ? "未知" : fan.isAutomatic ? "自動" : "手動")
-                }.monospacedDigit()
+        .chartYScale(domain: max(0, low-padding)...(high+padding))
+        .chartXScale(domain: end.addingTimeInterval(-Double(model.minutes*60))...end)
+        .chartYAxis { AxisMarks(position: .leading, values: .automatic(desiredCount: 4)) { _ in AxisGridLine(); AxisValueLabel() } }
+        .chartXAxis { AxisMarks(values: .automatic(desiredCount: 3)) { value in
+            AxisGridLine()
+            AxisValueLabel {
+                if let date = value.as(Date.self) {
+                    let seconds = max(0, Int(end.timeIntervalSince(date)))
+                    Text(seconds < (model.minutes == 1 ? 10 : 30) ? "現在" : (model.minutes == 1 ? "−\(seconds) 秒" : "−\(Int((Double(seconds)/60).rounded())) 分鐘"))
+                        .fixedSize()
+                }
             }
-        }.padding(.vertical, 8)
+        } }
+        .overlay { if values.isEmpty { Text("等待轉速資料").font(.callout).foregroundStyle(.secondary) } }
+        .accessibilityLabel("\(fan.name)最近 \(model.minutes) 分鐘的轉速")
     }
-    private func tableCell(_ text: String) -> some View { Text(text).frame(maxWidth: .infinity, alignment: .leading) }
 }
 
 private struct ChartSegment: Identifiable { let id: Int; let points: [HistoryPoint] }
