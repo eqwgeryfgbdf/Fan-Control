@@ -18,7 +18,7 @@
   "older_helper_update_prompt_observed": true,
   "app_opened": true,
   "expanded_panel_ui_verified": true,
-  "menu_bar_top_strip_visual": "awaiting-user-confirmation; tool captures app windows only",
+  "menu_bar_top_strip_visual": "user-confirmed: RPM, CPU, GPU and mini trend all visible; tool captures app windows only",
   "menu_bar_settings": {
     "rpm": true,
     "cpu": true,
@@ -271,5 +271,9 @@
     "Sleep/wake and physical fault injection not tested",
     "Apple Development signed; not notarized"
   ],
-  "local_evidence_directory": "/Users/server/Project/MacminiContoral/dist/install-v1.0.3-validation"
+  "local_evidence_directory": "/Users/server/Project/MacminiContoral/dist/install-v1.0.3-validation",
+  "menu_bar_top_strip_confirmation": {
+    "source": "user reply",
+    "answer": "四項都有顯示"
+  }
 }
