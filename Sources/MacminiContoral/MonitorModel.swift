@@ -74,12 +74,11 @@ import FanCore
         await control.apply(fan: fan.id, rpm: targetRPM.rounded())
     }
     func automatic() async {
-        manualSelection = false
-        if let fan, !fan.isAutomatic, !control.ownsManual {
+        if let fan, !fan.isAutomatic, !control.canRestore {
             control.message = "目前的手動設定不屬於此 App，請在原控制程式恢復自動調節。"
             return
         }
-        await control.restore()
+        if await control.restore() { manualSelection = false }
     }
     func quit() async {
         await control.restore()

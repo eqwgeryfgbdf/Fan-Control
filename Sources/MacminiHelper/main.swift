@@ -39,7 +39,17 @@ final class Session: NSObject, FanControlProtocol {
     let id = UUID()
     let state: ServiceState
     init(state: ServiceState) { self.state = state }
-    func ping(reply: @escaping (String) -> Void) { reply("MacminiContoral helper 1.0") }
+    func ping(reply: @escaping (String) -> Void) {
+        queue.async {
+            let control = self.state.control
+            let status = HelperStatus(version: helperVersion, build: helperBuild, ownedByClient: control.owner == self.id,
+                                      controlledFans: control.controller.journal.fans.sorted(),
+                                      recoveryPending: control.owner == nil && control.controller.needsRecovery,
+                                      recoveryReason: control.recoveryReason)
+            let data = try? JSONEncoder().encode(status)
+            reply(data.flatMap { String(data: $0, encoding: .utf8) } ?? "")
+        }
+    }
     func setManual(fan: Int, rpm: Double, reply: @escaping (String?) -> Void) {
         queue.async {
             do { try self.state.control.manual(session: self.id, fan: fan, rpm: rpm); reply(nil) }
@@ -94,6 +104,10 @@ guard let bundle = Bundle(url: bundleURL),
       team.range(of: "^[A-Z0-9]{10}$", options: .regularExpression) != nil else {
     fputs("Missing signing identity.\n", stderr); exit(1)
 }
+// Capture the running helper's version once. Replacing an app on disk cannot make
+// an old in-memory helper advertise the new executable's version.
+let helperVersion = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+let helperBuild = bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown"
 // A read-only packaging check; it never opens SMC or starts the control service.
 if CommandLine.arguments.dropFirst().contains("--validate-installation") {
     print("Validated helper bundle: \(bundleURL.path)")

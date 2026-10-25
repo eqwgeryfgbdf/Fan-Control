@@ -171,6 +171,12 @@ struct MenuPanel: View {
                 Picker("風扇", selection: $model.selectedFan) { ForEach(model.snapshot?.fans ?? []) { Text($0.name).tag($0.id) } }
             }
             controls
+            Label(control.health.rawValue, systemImage: control.health == .ready ? "checkmark.circle" : "info.circle")
+                .font(.caption).foregroundStyle(.secondary)
+            if control.enabled, control.health == .outdated || control.health == .disconnected {
+                Button("重新啟動控制服務") { Task { await control.restartService() } }
+                    .disabled(!control.canRestart)
+            }
             if !control.enabled {
                 VStack(alignment: .leading, spacing: 10) {
                     Button(control.requiresApproval ? "前往系統設定允許" : "啟用風扇控制") {
@@ -211,11 +217,15 @@ struct MenuPanel: View {
     }
     private var controls: some View {
         VStack(spacing: 16) {
-            Picker("控制模式", selection: $model.manualSelection) { Text("自動").tag(false); Text("手動").tag(true) }
+            Picker("控制模式", selection: Binding(get: { model.manualSelection }, set: { manual in
+                if manual { model.manualSelection = true }
+                else { Task { await model.automatic() } }
+            })) { Text("自動").tag(false); Text("手動").tag(true) }
                 .pickerStyle(.segmented)
                 .labelsHidden()
-                .onChange(of: model.manualSelection) { _, manual in if !manual && !control.busy { Task { await model.automatic() } } }
                 .disabled(control.busy)
+            Text(control.recoveryPending ? "正在確認恢復自動" : model.usableFan?.mode == nil ? "等待硬體狀態" : model.usableFan?.isAutomatic == true ? "目前由 macOS 自動調節" : "目前為手動調節")
+                .font(.caption).foregroundStyle(.secondary)
             if model.manualSelection, let fan = model.usableFan, fan.controllable, let minimum = fan.minimum, let maximum = fan.maximum {
                 HStack {
                     Text("目標轉速")
@@ -231,8 +241,8 @@ struct MenuPanel: View {
                         .font(.caption).foregroundStyle(.secondary).monospacedDigit()
                 }
                 HStack {
-                    Button("套用轉速") { Task { await model.apply() } }.buttonStyle(.borderedProminent).disabled(!control.enabled)
-                    Button("恢復自動調節") { Task { await model.automatic() } }.buttonStyle(.bordered).disabled(!control.ownsManual)
+                    Button("套用轉速") { Task { await model.apply() } }.buttonStyle(.borderedProminent).disabled(!control.canApply)
+                    Button("恢復自動調節") { Task { await model.automatic() } }.buttonStyle(.bordered).disabled(!control.canRestore)
                 }.disabled(control.busy)
             } else if model.manualSelection {
                 Text("尚未取得有效的硬體範圍，暫時無法調速。").font(.callout).foregroundStyle(.secondary)
@@ -260,16 +270,17 @@ struct SettingsView: View {
                 if let loginError { Text(loginError).foregroundStyle(.orange) }
             }
             Section("風扇控制") {
-                LabeledContent("服務狀態", value: control.enabled ? "已啟用" : control.requiresApproval ? "等待系統授權" : "尚未啟用")
+                LabeledContent("服務狀態", value: control.health.rawValue)
+                if let version = control.helperVersion { LabeledContent("控制服務版本", value: version) }
                 if !control.enabled {
                     Button(control.requiresApproval ? "開啟系統設定" : "啟用風扇控制") {
                         if control.requiresApproval { control.openApproval() } else { Task { await control.register() } }
                     }.disabled(control.busy)
                 } else {
                     Button("重新啟動控制服務") { Task { await control.restartService() } }
-                        .disabled(control.busy || control.ownsManual)
+                        .disabled(!control.canRestart)
                 }
-                Text("App 結束、控制連線中斷或系統過熱時，控制服務會恢復自動調節。").font(.caption).foregroundStyle(.secondary)
+                Text("App 結束、控制連線中斷、讀值持續失效或系統過熱時，控制服務會恢復自動調節。").font(.caption).foregroundStyle(.secondary)
             }
             Section("顯示與感測器") {
                 Toggle("選單列顯示迷你走勢圖", isOn: $showMenuBarTrend)
