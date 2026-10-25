@@ -8,9 +8,7 @@ private let queue = DispatchQueue(label: "local.macmini.contoral.hardware")
 private let journalURL = URL(fileURLWithPath: "/var/run/local.macmini.contoral.control.json")
 
 final class ServiceState {
-    let controller: FanController
-    var owner: UUID?
-    var lastHeartbeat = ControlClock.now
+    let control: ControlSessionState
     init() throws {
         let hardware = try SMC()
         let journal: ControlJournal
@@ -18,22 +16,22 @@ final class ServiceState {
             // A corrupt recovery journal must not silently permit new manual control.
             journal = try JSONDecoder().decode(ControlJournal.self, from: Data(contentsOf: journalURL))
         } else { journal = ControlJournal() }
-        controller = FanController(hardware: hardware, appleSilicon: HardwareInfo.string("machdep.cpu.brand_string").contains("Apple"), journal: journal) {
+        let controller = FanController(hardware: hardware, appleSilicon: HardwareInfo.string("machdep.cpu.brand_string").contains("Apple"), journal: journal) {
             try JSONEncoder().encode($0).write(to: journalURL, options: .atomic)
             try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: journalURL.path)
         }
-        if controller.needsRecovery { recover() }
+        let reader = SensorReader()
+        control = ControlSessionState(controller: controller, sample: { reader.sample() },
+                                      thermalState: { ProcessInfo.processInfo.thermalState.rawValue })
+        if controller.needsRecovery { recover(reason: .serviceRestart) }
     }
-    func recover() {
-        do { try controller.restore(); owner = nil }
+    func recover(reason: RecoveryReason) {
+        do { try control.recover(reason: reason) }
         catch { log.error("Automatic recovery pending: \(error.localizedDescription, privacy: .public)") }
     }
     func tick() {
-        guard controller.needsRecovery else { return }
-        let hot = ProcessInfo.processInfo.thermalState.rawValue >= ProcessInfo.ThermalState.serious.rawValue
-        if owner == nil || hot || ControlPolicy.expired(lastHeartbeat: lastHeartbeat, now: ControlClock.now) {
-            recover()
-        }
+        do { try control.tick() }
+        catch { log.error("Automatic recovery pending: \(error.localizedDescription, privacy: .public)") }
     }
 }
 
@@ -44,41 +42,23 @@ final class Session: NSObject, FanControlProtocol {
     func ping(reply: @escaping (String) -> Void) { reply("MacminiContoral helper 1.0") }
     func setManual(fan: Int, rpm: Double, reply: @escaping (String?) -> Void) {
         queue.async {
-            guard self.state.owner == nil || self.state.owner == self.id else {
-                reply("另一個 App 連線正在控制風扇。"); return
-            }
-            guard ProcessInfo.processInfo.thermalState.rawValue < ProcessInfo.ThermalState.serious.rawValue else {
-                self.state.recover(); reply("系統正在降溫，請使用自動調節。"); return
-            }
-            do {
-                try self.state.controller.manual(fan: fan, rpm: rpm)
-                self.state.owner = self.id
-                self.state.lastHeartbeat = ControlClock.now
-                reply(nil)
-            } catch {
-                if self.state.controller.needsRecovery { self.state.owner = nil }
-                reply(error.localizedDescription)
-            }
+            do { try self.state.control.manual(session: self.id, fan: fan, rpm: rpm); reply(nil) }
+            catch { reply(error.localizedDescription) }
         }
     }
     func restoreAutomatic(reply: @escaping (String?) -> Void) {
         queue.async {
-            guard self.state.owner == nil || self.state.owner == self.id else {
-                reply("另一個 App 連線正在控制風扇。"); return
-            }
-            do { try self.state.controller.restore(); self.state.owner = nil; reply(nil) }
-            catch { self.state.owner = nil; reply(error.localizedDescription) }
+            do { try self.state.control.restore(session: self.id); reply(nil) }
+            catch { reply(error.localizedDescription) }
         }
     }
     func heartbeat(reply: @escaping (Bool) -> Void) {
-        queue.async {
-            if self.state.owner == self.id { self.state.lastHeartbeat = ControlClock.now }
-            reply(self.state.owner == self.id)
-        }
+        queue.async { reply(self.state.control.heartbeat(session: self.id)) }
     }
     func disconnected() {
         queue.async {
-            if self.state.owner == self.id { self.state.owner = nil; self.state.recover() }
+            do { try self.state.control.disconnected(session: self.id) }
+            catch { log.error("Automatic recovery pending: \(error.localizedDescription, privacy: .public)") }
         }
     }
 }
@@ -133,7 +113,7 @@ do {
     timer.resume()
     signal(SIGTERM, SIG_IGN)
     let termination = DispatchSource.makeSignalSource(signal: SIGTERM, queue: queue)
-    termination.setEventHandler { state.recover(); exit(0) }
+    termination.setEventHandler { state.recover(reason: .serviceStopping); exit(0) }
     termination.resume()
     // The daemon stays alive so launchd can restart it and recover the journal after a crash.
     withExtendedLifetime((listener, delegate, timer, termination)) { RunLoop.current.run() }
